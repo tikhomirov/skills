@@ -1,11 +1,22 @@
 {
   "name": "@tikhomirov/skills",
   "version": "1.0.0",
-  "description": "Curated collection of production-ready Agent Skills (MoonShine, Dandy Style, Dandy Design, Dandy Commit, etc.)",
-  "main": "skill.sh",
+  "description": "Curated collection of production-ready Agent Skills (MoonShine, Laravel Best Practices, Pest, API Integrations, WordPress Clean Plugin, Dandy Style, Dandy Design, Dandy Commit, etc.)",
+  "type": "module",
+  "bin": {
+    "skills": "./bin/skills.mjs",
+    "tikhomirov-skills": "./bin/skills.mjs"
+  },
+  "files": [
+    "skills",
+    "bin/skills.mjs",
+    "skill.sh",
+    "install.sh",
+    "README.md"
+  ],
   "scripts": {
-    "install:global": "./skill.sh --global",
-    "install:local": "./skill.sh"
+    "install:global": "node ./bin/skills.mjs --global",
+    "install:local": "node ./bin/skills.mjs"
   },
   "keywords": [
     "agent-skills",
@@ -13,9 +24,18 @@
     "codex",
     "opencode",
     "moonshine",
+    "laravel",
+    "pest",
     "dandy-code",
-    "laravel"
+    "wordpress"
   ],
   "author": "Aleksei Tikhomirov",
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tikhomirov/skills.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
 }
