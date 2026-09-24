@@ -1,6 +1,8 @@
 # Agent Skills Collection ⚡
 
-A curated collection of production-ready **Agent Skills** for AI coding assistants (Claude Code, Codex, OpenCode, Pi, Cursor, etc.).
+A curated collection of production-ready **Agent Skills** for AI coding assistants (**Claude Code**, **Codex**, **OpenCode**, **Pi**, **Cursor**, etc.).
+
+Designed for modern **PHP 8.3+**, **Laravel 11/12/13**, **MoonShine Admin**, **Pest PHP**, **APIs & Webhooks**, **UI/UX Engineering**, and clean **OOP WordPress**.
 
 ---
 
@@ -8,48 +10,61 @@ A curated collection of production-ready **Agent Skills** for AI coding assistan
 
 | Skill | Description | Location |
 |---|---|---|
-| **`moonshine`** | Comprehensive toolkit for building, configuring, and extending Laravel **MoonShine** admin panels (MoonShine 4.x & 3.x). Includes deep-dive references for ModelResources, CRUD pages, relationships, FormBuilder, TableBuilder, and Blade components. | `skills/moonshine` |
-| **`dandy-style`** | Dandy Code philosophy and 22 structured recipes for clean, idiomatic, readable, and maintainable PHP/Laravel code without unnecessary boilerplate. | `skills/dandy-style` |
+| **`moonshine`** | Comprehensive toolkit for building, configuring, and extending Laravel **MoonShine** admin panels (MoonShine 4.x & 3.x). Deep-dive references for ModelResources, CRUD pages, relationships, FormBuilder, TableBuilder, and Blade components. | `skills/moonshine` |
+| **`laravel-best-practices`** | Modern Laravel architecture: single-action controllers/actions, form requests, Eloquent eager loading, query optimization, standard API envelopes, and security best practices. | `skills/laravel-best-practices` |
+| **`laravel-strict`** | Strict model enforcement (`nunomaduro/essentials`), auto eager loading, immutable dates, HTTP client fakes, Livewire security patterns, and 28 actionable recipes. | `skills/laravel-strict` |
+| **`pest-testing`** | Pest PHP v3/v4 testing guide for Laravel: Feature/Unit tests, Architecture tests (`arch()`), datasets, and mocking external services (`Http::fake()`, `Queue::fake()`, `Event::fake()`). | `skills/pest-testing` |
+| **`api-integrations`** | Resilient external API integrations & webhook receivers: HMAC signature validation, idempotency keys, automatic retry backoff, sensitive data masking, and deduplication. | `skills/api-integrations` |
+| **`wordpress-clean-plugin`** | Modern Object-Oriented WordPress & WooCommerce plugins with PSR-4 autoloading, strict security (nonces/capabilities), Transients caching, and zero global clutter. | `skills/wordpress-clean-plugin` |
+| **`dandy-style`** | Dandy Code philosophy and 22 structured recipes for clean, idiomatic, readable PHP/Laravel code without unnecessary boilerplate. | `skills/dandy-style` |
 | **`dandy-design`** | Concise MUST / SHOULD / NEVER rules for building accessible, responsive, fast, and delightful user interfaces. | `skills/dandy-design` |
 | **`dandy-commit`** | Pre-commit git diff inspector to eliminate style drift, duplicate abstractions, and noisy AI-generated code smells before pushing. | `skills/dandy-commit` |
+| **`ai-docs-setup`** | Automated setup of standardized agent documentation (`AGENTS.md`, `CLAUDE.md`, `.ai/MEMORY.md`, `.ai/project-rules.md`, `.ai/glossary.md`). | `skills/ai-docs-setup` |
 
 ---
 
-## 🚀 Quick Start & Installation
+## 🚀 One-Line Installation
 
-### Option 1: Using the installation script
+### Install Globally (All projects & agents)
+```bash
+curl -sSL https://raw.githubusercontent.com/tikhomirov/skills/main/install.sh | bash -s -- --global
+```
 
-Clone this repository and run the installer:
+### Install Into Current Project Only
+```bash
+curl -sSL https://raw.githubusercontent.com/tikhomirov/skills/main/install.sh | bash
+```
+
+### Install Specific Skills Only
+```bash
+curl -sSL https://raw.githubusercontent.com/tikhomirov/skills/main/install.sh | bash -s -- --global moonshine laravel-best-practices pest-testing
+```
+
+---
+
+## 🛠 Local CLI Installation (`skill.sh`)
+
+If you cloned the repository:
 
 ```bash
 git clone https://github.com/tikhomirov/skills.git
 cd skills
 ```
 
-**Install globally (available across all your projects):**
 ```bash
+# Global install
 ./skill.sh --global
-```
 
-**Install locally in the current project (`.agents/skills/` & `.claude/skills/`):**
-```bash
+# Local project install
 ./skill.sh
+
+# Install specific skills
+./skill.sh --global moonshine pest-testing
 ```
 
-**Install only a specific skill (e.g. MoonShine):**
-```bash
-./skill.sh --global moonshine
-```
-
----
-
-### Option 2: Manual Installation
-
-Copy or symlink the desired skill folder from `skills/<skill-name>` to your agent's skills directory:
-
-* **Global Agent Skills:** `~/.agents/skills/<skill-name>` or `~/.config/opencode/skills/<skill-name>`
-* **Project Agent Skills:** `<your-project>/.agents/skills/<skill-name>`
-* **Claude Code Skills:** `~/.claude/skills/<skill-name>` or `<your-project>/.claude/skills/<skill-name>`
+Supported agent paths:
+* **Global:** `~/.agents/skills/`, `~/.config/opencode/skills/`, `~/.claude/skills/`, `~/.pi/skills/`
+* **Local:** `.agents/skills/`, `.opencode/skills/`, `.claude/skills/`, `.pi/skills/`
 
 ---
 
@@ -57,45 +72,25 @@ Copy or symlink the desired skill folder from `skills/<skill-name>` to your agen
 
 ```text
 skills/
-├── skills/                      # Main skills source directory
-│   ├── moonshine/               # MoonShine 4.x admin panel skill & references
-│   │   ├── SKILL.md
-│   │   └── references/
-│   │       ├── model-resources.md
-│   │       ├── fields-guide.md
-│   │       ├── relationships.md
-│   │       ├── blade-components.md
-│   │       └── common-patterns.md
-│   ├── dandy-style/             # Dandy Code PHP/Laravel design recipes
-│   │   ├── SKILL.md
-│   │   ├── recipe-map.md
-│   │   └── recipes/
-│   ├── dandy-design/            # UI/UX engineering rules
-│   │   └── SKILL.md
-│   └── dandy-commit/            # Safe git diff pre-commit review
-│       └── SKILL.md
+├── skills/                      # Main skills directory
+│   ├── moonshine/
+│   ├── laravel-best-practices/
+│   ├── laravel-strict/
+│   ├── pest-testing/
+│   ├── api-integrations/
+│   ├── wordpress-clean-plugin/
+│   ├── dandy-style/
+│   ├── dandy-design/
+│   ├── dandy-commit/
+│   └── ai-docs-setup/
 ├── .agents/skills/              # Compatibility mirror
-├── skill.sh                     # Fast multi-agent installer script
+├── install.sh                   # Remote one-line curl installer
+├── skill.sh                     # Local multi-agent installer script
 └── README.md
 ```
 
 ---
 
-## 🛠 Adding New Skills
-
-1. Create a directory inside `skills/<your-skill-name>/`.
-2. Add a `SKILL.md` file starting with YAML frontmatter:
-   ```yaml
-   ---
-   name: your-skill-name
-   description: Concise description explaining when this skill should be invoked.
-   ---
-   ```
-3. Place any extended guides, schemas, or templates in `references/` or `assets/`.
-4. Run `./skill.sh --global <your-skill-name>` to install.
-
----
-
 ## 📄 License
 
-MIT
+MIT © [Aleksei Tikhomirov](https://github.com/tikhomirov)
