@@ -4,8 +4,8 @@
   "description": "Curated collection of production-ready Agent Skills (MoonShine, Laravel Best Practices, Pest, API Integrations, WordPress Clean Plugin, Dandy Style, Dandy Design, Dandy Commit, etc.)",
   "type": "module",
   "bin": {
-    "skills": "./bin/skills.mjs",
-    "tikhomirov-skills": "./bin/skills.mjs"
+    "skills": "bin/skills.mjs",
+    "tikhomirov-skills": "bin/skills.mjs"
   },
   "files": [
     "skills",
