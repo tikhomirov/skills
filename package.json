@@ -1,0 +1,21 @@
+{
+  "name": "@tikhomirov/skills",
+  "version": "1.0.0",
+  "description": "Curated collection of production-ready Agent Skills (MoonShine, Dandy Style, Dandy Design, Dandy Commit, etc.)",
+  "main": "skill.sh",
+  "scripts": {
+    "install:global": "./skill.sh --global",
+    "install:local": "./skill.sh"
+  },
+  "keywords": [
+    "agent-skills",
+    "claude-code",
+    "codex",
+    "opencode",
+    "moonshine",
+    "dandy-code",
+    "laravel"
+  ],
+  "author": "Aleksei Tikhomirov",
+  "license": "MIT"
+}
