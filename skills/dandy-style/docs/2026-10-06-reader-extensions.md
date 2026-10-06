@@ -55,5 +55,5 @@ skills/dandy-style/
 ## Коммит
 
 - Repo: `/home/alex/Projects/skills`
-- Hash: `122b06e6fcc13ab712bea3aeb90a90797eebddc7`
+- Hash: `6361513c03f18b985aeb4d53aa4a71d676075c2b`
 - Не включено: грязные `README.md`, `skills/iiko-docs/`
