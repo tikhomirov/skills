@@ -3,3 +3,7 @@
 .idea/
 .vscode/
 node_modules/
+.claude/
+.opencode/
+.pi/
+

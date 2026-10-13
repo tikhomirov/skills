@@ -11,6 +11,7 @@ Designed for modern **PHP 8.3+**, **Laravel 11/12/13**, **MoonShine Admin**, **P
 | Skill | Description | Location |
 |---|---|---|
 | **`moonshine`** | Comprehensive toolkit for building, configuring, and extending Laravel **MoonShine** admin panels (MoonShine 4.x & 3.x). Deep-dive references for ModelResources, CRUD pages, relationships, FormBuilder, TableBuilder, and Blade components. | `skills/moonshine` |
+| **`laraway`** | Core philosophy, conventions, and pragmatic architecture of **The Laravel Way** (laraway.github.io, Laracasts, community practices). Anti-pattern prevention (no cargo-cult repositories, no N+1, lean controllers, native PHP vs magic balance). | `skills/laraway` |
 | **`laravel-best-practices`** | Modern Laravel architecture: single-action controllers/actions, form requests, Eloquent eager loading, query optimization, standard API envelopes, and security best practices. | `skills/laravel-best-practices` |
 | **`laravel-strict`** | Strict model enforcement (`nunomaduro/essentials`), auto eager loading, immutable dates, HTTP client fakes, Livewire security patterns, and 28 actionable recipes. | `skills/laravel-strict` |
 | **`pest-testing`** | Pest PHP v3/v4 testing guide for Laravel: Feature/Unit tests, Architecture tests (`arch()`), datasets, and mocking external services (`Http::fake()`, `Queue::fake()`, `Event::fake()`). | `skills/pest-testing` |
@@ -20,6 +21,7 @@ Designed for modern **PHP 8.3+**, **Laravel 11/12/13**, **MoonShine Admin**, **P
 | **`dandy-design`** | Concise MUST / SHOULD / NEVER rules for building accessible, responsive, fast, and delightful user interfaces. | `skills/dandy-design` |
 | **`dandy-commit`** | Pre-commit git diff inspector to eliminate style drift, duplicate abstractions, and noisy AI-generated code smells before pushing. | `skills/dandy-commit` |
 | **`ai-docs-setup`** | Automated setup of standardized agent documentation (`AGENTS.md`, `CLAUDE.md`, `.ai/MEMORY.md`, `.ai/project-rules.md`, `.ai/glossary.md`). | `skills/ai-docs-setup` |
+| **`iiko-docs`** | Навигация и поиск по документации iiko Cloud API, iikoWeb, Telegram-каналу iikoapi, ядру iiko-core и плагину woo2iiko с предупреждениями о расхождениях со Swagger. | `skills/iiko-docs` |
 
 ---
 
