@@ -1,7 +1,7 @@
 ---
 name: wordpress-clean-plugin
-description: Modern Object-Oriented WordPress development: architectural archetypes (Micro-plugins, Multi-module Combines, Super-plugins), PSR-11 DI container, strict hook encapsulation, and recipe-based engineering.
-argument-hint: [plugin task, archetype, or "audit" / "security-audit"]
+description: "Modern Object-Oriented WordPress development: architectural archetypes (Micro-plugins, Multi-module Combines, Super-plugins), PSR-11 DI container, strict hook encapsulation, and recipe-based engineering."
+argument-hint: "[plugin task, archetype, or \"audit\" / \"security-audit\"]"
 ---
 
 # WordPress Clean Architecture & Plugin Framework
