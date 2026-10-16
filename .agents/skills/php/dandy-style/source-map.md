@@ -1,6 +1,8 @@
 # Dandy Code Source Map
 
-This package must stay close to the book. Do not invent a generic clean-code framework when a chapter gives a concrete recipe.
+Official recipes stay close to the book chapters below. Do not invent a generic clean-code framework when a chapter already gives a concrete recipe.
+
+This skill is **not** a frozen 1:1 reprint of the book: material ages, and new problems (including AI-era smells) may get **reader/author extensions** under `extensions/`. Those are part of the skill, not book chapters — never invent a fake `content/0xx-*.md` path for them.
 
 Use this map to connect agent behavior to the original chapter topics.
 
@@ -42,4 +44,7 @@ For broad Dandy Code workflows, follow the book order:
 8. check cleanup: comments, removal, AI drift;
 9. check ecosystem discipline: framework conventions and upgrades.
 
-If a recommendation is not connected to a chapter-derived recipe, label it as an extra recommendation, not Dandy Code.
+If a recommendation is not connected to a chapter-derived recipe:
+
+- check `extensions/recipe-map.md` — if it matches a reader/author extension, use it and label it as such;
+- otherwise label it as an extra recommendation, not as a book chapter.

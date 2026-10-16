@@ -21,6 +21,7 @@ For broad direct review, read `source-map.md` first. For contextual use, load on
 | Empty catch, generic Exception, swallowed errors | `recipes/exceptions.md` |
 | Large method/class, mixed abstraction levels | `recipes/size.md` |
 | Ceremony, wrappers, future-proofing | `recipes/no-nonsense.md` |
+| "Just in case" fallbacks, cascading ternaries, AI guessing a second source of truth | `extensions/recipes/just-in-case.md` (reader extension — not a book chapter) |
 | Dead code, old backups, commented blocks, unused files | `recipes/remove.md` |
 | Hard-to-test code, hidden dependencies, mixed IO and logic | `recipes/tests.md` |
 | Fighting Laravel/framework conventions, custom layers over built-in features | `recipes/frameworks.md` and `recipes/laravel-way.md` |
@@ -35,3 +36,10 @@ For broad direct review, read `source-map.md` first. For contextual use, load on
 - Commit mode: inspect changed files first.
 - Breakdown mode: load recipes for selected code only.
 - Never load examples unless editing or explaining concrete code.
+
+## Reader / author extensions
+
+Official book-derived recipes live in `recipes/`.
+Additional smells that are **not** book chapters live under `extensions/` — see `extensions/README.md` and `extensions/recipe-map.md`.
+
+When loading an extension recipe, label the advice as a Dandy Style reader/author extension, not as an official chapter of «Денди-код».

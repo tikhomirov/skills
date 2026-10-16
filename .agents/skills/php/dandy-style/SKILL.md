@@ -1,6 +1,10 @@
 ---
 name: dandy-style
-description: Use Dandy Code / dandy-style to improve and review PHP/Laravel code.
+description: >-
+  Living Dandy Code style for PHP/Laravel review and improvement — inspired by
+  «Денди-код», not a 1:1 book copy. Author reinterpretation plus reader extensions
+  (e.g. just-in-case). Use when reviewing, refactoring, or tightening readable Laravel code.
+version: 1.2.0
 ---
 
 # Dandy Style
@@ -8,6 +12,22 @@ description: Use Dandy Code / dandy-style to improve and review PHP/Laravel code
 Dandy Style is a way of thinking: first understand the project and the real task, then find weak spots in the code, and only then use Dandy Code recipes as tools.
 
 Use the recipes, but do not limit yourself to them.
+
+## Relation to the book «Денди-код»
+
+This skill is **not** a one-to-one copy of the book.
+
+It is a **living / author reinterpretation** for agents: the book is the root inspiration, but:
+
+- book chapters age; tooling, frameworks, and day-to-day pain change;
+- modern work (especially AI-assisted coding) creates new smells and needs new recipes;
+- the recipe set **grows** beyond the printed table of contents.
+
+Official recipes in `recipes/` stay tied to book chapters via `source-map.md`.
+**Reader / author extensions** live in `extensions/` (see `extensions/README.md`).
+They are part of Dandy Style as a skill ecosystem, **not** official chapters of the book author.
+
+Today there is one such extension (`just-in-case`); more may follow. When you use one, say that it is a reader/author extension, not a book chapter.
 
 ## Core rule
 
@@ -21,7 +41,7 @@ Workflow:
 2. Find weak spots.
 3. Rank them and choose the most important ones.
 4. Explain why they matter.
-5. Select 1–3 relevant recipes.
+5. Select 1–3 relevant recipes (official and/or extensions).
 6. Suggest a small, safe next action.
 
 ## Invocation modes
@@ -63,6 +83,7 @@ Use this mode when Dandy Style is mentioned inside another task or when the user
 ## How to use recipes
 
 Use `recipe-map.md` only after finding concrete signs of a problem in the code.
+For reader extensions, also check `extensions/recipe-map.md`.
 
 Do not load all recipes “just in case”.
 
@@ -78,6 +99,7 @@ Do not load all recipes “just in case”.
 - Comments should explain “why”, not repeat “what”.
 - Magic values should become meaning, not pointless constants.
 - AI-generated code is plausible, but not trusted until checked.
+- One source of truth beats speculative “just in case” fallbacks (see extensions).
 - Refactoring should be small, safe, and verifiable.
 
 Dandy Style is not limited to these recipes. The recipes highlight frequent problems and common fixes. If another best-practice recipe fits better, suggest it.
