@@ -10,6 +10,7 @@ Designed for modern **PHP 8.3+**, **Laravel 11/12/13**, **MoonShine Admin**, **P
 
 | Skill | Description | Location |
 |---|---|---|
+| **`obsidian`** | Knowledge bases, properties, native Bases/Kanban (1.14+), CLI, Canvas, safe task and agent coordination. Official syntax references included. | `skills/engineering/obsidian` |
 | **`main-rule`** | Baseline senior development rules: simplicity, minimal code volume, step-by-step plans, and working code first. | `skills/main` |
 | **`moonshine`** | Comprehensive toolkit for building, configuring, and extending Laravel **MoonShine** admin panels (MoonShine 4.x & 3.x). Deep-dive references for ModelResources, CRUD pages, relationships, FormBuilder, TableBuilder, and Blade components. | `skills/php/moonshine` |
 | **`laraway`** | Core philosophy, conventions, and pragmatic architecture of **The Laravel Way** (laraway.github.io, Laracasts, community practices). Anti-pattern prevention (no cargo-cult repositories, no N+1, lean controllers, native PHP vs magic balance). | `skills/php/laraway` |
