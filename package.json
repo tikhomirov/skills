@@ -3,20 +3,29 @@
   "version": "1.2.0",
   "description": "Curated collection of production-ready Agent Skills (MoonShine, Laravel Best Practices, Pest, API Integrations, WordPress Clean Plugin, Dandy Style, Dandy Design, Dandy Commit, etc.)",
   "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
   "bin": {
-    "skills": "bin/skills.mjs",
-    "tikhomirov-skills": "bin/skills.mjs"
+    "skills-install": "bin/skills-install",
+    "obsidian-project-framework": "bin/obsidian-project-framework",
+    "skills": "bin/skills-install",
+    "tikhomirov-skills": "bin/skills-install"
   },
   "files": [
     "skills",
-    "bin/skills.mjs",
+    "bin",
+    "src",
+    "scripts",
     "skill.sh",
     "install.sh",
     "README.md"
   ],
   "scripts": {
-    "install:global": "node ./bin/skills.mjs --global",
-    "install:local": "node ./bin/skills.mjs"
+    "install:global": "node ./bin/skills-install --global",
+    "install:local": "node ./bin/skills-install",
+    "test": "node --test tests/*/*.test.mjs",
+    "check": "node scripts/check.mjs"
   },
   "keywords": [
     "agent-skills",

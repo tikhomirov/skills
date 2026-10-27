@@ -1,0 +1,2 @@
+#!/usr/bin/env node
+import '../src/obsidian-project-framework/index.mjs';

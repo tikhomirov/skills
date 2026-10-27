@@ -12,8 +12,6 @@ trap cleanup EXIT
 echo "⬇ Downloading skills from $REPO_URL..."
 git clone --depth 1 "$REPO_URL" "$TMP_DIR" > /dev/null 2>&1
 
-cd "$TMP_DIR"
-chmod +x ./skill.sh
-./skill.sh "$@"
+"$TMP_DIR/bin/skills-install" "$@"
 
 echo "✨ All set! Your AI coding agents now have access to the skills."
