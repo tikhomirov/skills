@@ -32,7 +32,7 @@ install_target() {
             continue
         fi
 
-        rm -rf "$TARGET_PATH"
+        if [ -d "$TARGET_PATH" ] && [ ! -L "$TARGET_PATH" ]; then diff -r "$SRC_PATH" "$TARGET_PATH" > /dev/null 2>&1 || cp -r "$TARGET_PATH" "${TARGET_PATH}.backup.$(date +%s)"; fi; rm -rf "$TARGET_PATH"
         if [ "$TYPE" = "copy" ]; then
             cp -r "$SRC_PATH" "$TARGET_PATH"
         else
