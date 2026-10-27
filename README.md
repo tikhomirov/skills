@@ -8,6 +8,46 @@ Designed for modern **PHP 8.3+**, **Laravel 11/12/13**, **MoonShine Admin**, **P
 
 ---
 
+## Start here: your first project
+
+The framework lets your coding agent keep project tasks, documentation and session memory in an Obsidian vault. You discuss decisions with the agent and use the Kanban board to move tasks.
+
+### 1. Install once
+
+You need **Node.js 20+**, Git, and **Obsidian 1.14+** with Bases enabled.
+
+```bash
+git clone https://github.com/tikhomirov/skills.git
+cd skills
+npm ci
+npm link
+skills-install obsidian obsidian-project-framework project-workshop improvement --global
+```
+
+Already cloned? Start with `cd skills`. `npm link` puts the executable helpers on your PATH; `skills-install` installs the agent instructions. If linking fails due to permissions, use a user-owned Node.js installation rather than running the whole setup with sudo.
+
+### 2. Ask your agent to set up the project
+
+Open **your application's repository** in your AI coding assistant. Restart its session if necessary to discover the newly installed skills. Send:
+
+> Use project-workshop and obsidian-project-framework to set up this project's documentation in Obsidian. Vault: `/absolute/path/to/vault`; project ID: `my-project`. First inspect the project and existing documents, then agree on rules and modules with me. Do not change application code. Back up documents before replacing them. Create module documentation only after my explicit permission.
+
+**Replace the path and ID.** The vault is an existing folder opened in Obsidian, not the application source directory. The agent asks questions and creates the structure; you do not need to write configuration files or learn the CLI first. If skills are not discovered, point the agent to `skills/obsidian-project-framework/SKILL.md` and `skills/project-workshop/SKILL.md` in this clone.
+
+### 3. Open the board and work
+
+In Obsidian, open `Projects/my-project/Tasks/_Задачи.base`. An existing `Проекты/` folder is reused. Initial columns are **Backlog → In Progress → Done**.
+
+- Give the agent a task; it creates the card and records the result.
+- Drag cards yourself; before continuing, the agent runs `task sync` and preserves your chosen status.
+- Ask to change statuses; their short source of truth is `_statuses.md`.
+- Find memory/reports in `_agents/` and accepted user decisions in `Решения/`.
+- Ask to archive or restore a completed task by ID; its card and history are retained.
+
+You **do not need to enable Obsidian's own CLI**. Framework commands operate on files. A Done card is not proof that application tests passed.
+
+For manual commands: `obsidian-project-framework --help`. The sections below are reference material, not additional onboarding steps.
+
 ## 📦 Included Skills and Frameworks
 
 Apply `improvement` before and after changes: verify recommendations, prefer the smallest useful patch, evaluate neighboring contracts and stage risky migrations explicitly.
