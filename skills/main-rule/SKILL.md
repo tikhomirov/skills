@@ -1,6 +1,6 @@
 ---
 name: main-rule
-description: (no description)
+description: Базовые системные правила работы агента (Senior Developer подход, минимализм, доведение задач до конца).
 disable-model-invocation: true
 ---
 
