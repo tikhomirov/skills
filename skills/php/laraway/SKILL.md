@@ -1,10 +1,10 @@
 ---
 name: laraway
-description: Инструкции и стандарты разработки на Laravel. Use for any Laravel project.
+description: Инструкции, стандарты и best practices разработки на Laravel (PHP 8.3+, Laravel 11/12+). Use for any Laravel project.
 argument-hint: [task description]
 ---
 
-# LaraWay
+# LaraWay: Стандарты и Best Practices Laravel
 
 ## 1. Баланс: нативный PHP против избыточной магии
 - Не оборачивай массивы в `collect()` ради 1–2 операций — используй `[]`, `in_array`, `array_map`, `count`.
@@ -48,3 +48,7 @@ argument-hint: [task description]
 - **Именованные роуты:** Запрещен хардкод URL-строк в шаблонах и редиректах — только `route('posts.show', $post)`.
 - **Медиафайлы:** Запрещено сохранять файлы напрямую в `public/` — используй `Storage::disk('public')` и `storage:link`.
 - **Mass Assignment:** Всегда определяй `$fillable` в моделях и передавай в `create()`/`update()` только `$request->validated()`.
+- **Транзакции и целостность:** Многотабличные изменения всегда оборачивай в DB::transaction.
+- **Предотвращение N+1 (Eager Loading):** Всегда жадно подгружай связи (with), используемые в циклах и Resource. Включай Model::shouldBeStrict(! app()->isProduction()).
+- **Большие выборки:** Запрещено загружать объемные таблицы через all() или get(). Используй chunkById() или lazyById().
+- **Очереди и задачи (Queues/Jobs):** Делай джобы идемпотентными (проверяй состояние перед повторным выполнением), передавай только ID моделей, реализовывай метод failed().
