@@ -14,35 +14,15 @@ import { cmdMigrate } from "./src/cmd_migrate.mjs";
 import { cmdDoctor } from "./src/cmd_doctor.mjs";
 const args = process.argv.slice(2);
 if (args.includes("--help") || args.includes("-h") || args.length === 0) {
-  console.log("Obsidian Project OS CLI v" + VERSION + "\
-\
-Usage: project <command> [options]\
-\
-Commands:\
-  init\
-  status\
-  task create <title>\
-  task start <id>\
-  task complete <id>\
-  context [mode]\
-  memory checkpoint [msg]\
-  knowledge search <query>\
-  knowledge sync [id]\
-  migrate\
-  doctor");
+  console.log("Obsidian Project OS CLI v" + VERSION + "\\n\\nUsage: project <command> [options]\\n\\nCommands:\\n  init\\n  status\\n  task create <title>\\n  task start <id>\\n  task complete <id>\\n  context [mode]\\n  memory checkpoint [msg]\\n  knowledge search <query>\\n  knowledge sync [id]\\n  migrate\\n  doctor");
   process.exit(0);
 }
 const flags = { dryRun: args.includes("--dry-run"), force: args.includes("--force"), json: args.includes("--json") };
-let vaultArg = null;
-const vIdx = args.indexOf("--vault"); if (vIdx !== -1 && args[vIdx + 1]) vaultArg = args[vIdx + 1];
-let projArg = null;
-const pIdx = args.indexOf("--project"); if (pIdx !== -1 && args[pIdx + 1]) projArg = args[pIdx + 1];
-let tokenBudget = 4000;
-const tbIdx = args.indexOf("--token-budget"); if (tbIdx !== -1 && args[tbIdx + 1]) tokenBudget = parseInt(args[tbIdx + 1], 10);
-const projectRoot = findProjectRoot();
-const projectId = projArg || getProjectId(projectRoot);
-const vaultRoot = findVaultRoot(vaultArg);
-const paths = vaultRoot ? getProjectPaths(vaultRoot, projectId) : {};
+let vaultArg = null; const vIdx = args.indexOf("--vault"); if (vIdx !== -1 && args[vIdx + 1]) vaultArg = args[vIdx + 1];
+let projArg = null; const pIdx = args.indexOf("--project"); if (pIdx !== -1 && args[pIdx + 1]) projArg = args[pIdx + 1];
+let tokenBudget = 4000; const tbIdx = args.indexOf("--token-budget"); if (tbIdx !== -1 && args[tbIdx + 1]) tokenBudget = parseInt(args[tbIdx + 1], 10);
+const projectRoot = findProjectRoot(); const projectId = projArg || getProjectId(projectRoot);
+const vaultRoot = findVaultRoot(vaultArg); const paths = vaultRoot ? getProjectPaths(vaultRoot, projectId) : {};
 const cmd = args[0];
 try {
   let res;
@@ -51,7 +31,7 @@ try {
   else if (cmd === "task") {
     const sub = args[1];
     if (sub === "create") res = cmdTaskCreate({ paths, title: args[2] || "Новая задача", ...flags });
-    else if (sub === "start") res = cmdTaskStart({ paths, taskId: args[2], ...flags });
+    else if (sub === "start") res = cmdTaskStart({ paths, taskId: args[2], projectRoot, ...flags });
     else if (sub === "complete") res = cmdTaskComplete({ paths, taskId: args[2], ...flags });
     else throw new Error("Unknown task subcommand: " + sub);
   }
@@ -70,6 +50,5 @@ try {
   else if (res && res.output) console.log(res.output);
   else console.log(res);
 } catch (err) {
-  console.error("Error:", err.message);
-  process.exit(1);
+  console.error("Error:", err.message); process.exit(1);
 }

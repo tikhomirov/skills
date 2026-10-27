@@ -45,3 +45,25 @@ export function getGitDiff(cwd) {
 export function getGitHead(cwd) {
   try { return execSync("git rev-parse --short HEAD", { cwd, encoding: "utf8" }).trim(); } catch { return "initial"; }
 }
+export function isHumanPath(targetPath, paths = null) {
+  const absTarget = path.resolve(targetPath);
+  let realTarget = absTarget;
+  try { if (fs.existsSync(absTarget)) realTarget = fs.realpathSync(absTarget); else if (fs.existsSync(path.dirname(absTarget))) realTarget = path.join(fs.realpathSync(path.dirname(absTarget)), path.basename(absTarget)); } catch {}
+  if (paths && paths.humanDir) {
+    const absHuman = path.resolve(paths.humanDir);
+    let realHuman = absHuman;
+    try { if (fs.existsSync(absHuman)) realHuman = fs.realpathSync(absHuman); } catch {}
+    if (realTarget === realHuman || realTarget.startsWith(realHuman + path.sep)) return true;
+  }
+  if (absTarget.split(path.sep).includes("HUMAN") || realTarget.split(path.sep).includes("HUMAN")) return true;
+  return false;
+}
+export function assertAgentWritable(targetPath, paths = null) {
+  if (isHumanPath(targetPath, paths)) {
+    throw new Error("SECURITY VIOLATION: Cannot write or modify HUMAN-owned path: " + targetPath + ". Agents can only modify AGENT/ zone.");
+  }
+}
+export function safeWriteAgent(p, content, dryRun = false, paths = null) {
+  assertAgentWritable(p, paths);
+  return safeWrite(p, content, dryRun);
+}
