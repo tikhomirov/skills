@@ -10,7 +10,7 @@ import { listTasks } from './task-store.mjs';
 const usage = {
   init: 'init', status: 'status',
   decision: 'decision record <title> --task TASK-ID --summary <text> --source <user confirmation>',
-  task: 'task create <title> | task start <TASK-ID> | task status <TASK-ID> <status> | task complete <TASK-ID> | task sync',
+  task: 'task create <title> | task start <TASK-ID> | task status <TASK-ID> <status> | task complete <TASK-ID> | task sync | task archive <TASK-ID> | task restore <TASK-ID>',
   context: 'context [--mode brief|full|task|topic] [--task TASK-ID] [--topic text]',
   checkpoint: 'checkpoint [message]',
   knowledge: 'knowledge search <query> | knowledge sync [TASK-ID] --summary <text> --checks <text> --verification passed|not-required',
@@ -28,6 +28,8 @@ const routes = {
   init: ['init', 'cmdInit'], status: ['status', 'cmdStatus'],
   'decision record': ['decision', 'cmdDecisionRecord'],
   'task create': ['task', 'cmdTaskCreate'], 'task start': ['task', 'cmdTaskStart'],
+  'task archive': ['archive', 'cmdTaskArchive'],
+  'task restore': ['archive', 'cmdTaskArchive'],
   'task sync': ['task', 'cmdTaskSync'],
   'task status': ['task', 'cmdTaskStatus'], 'task complete': ['task', 'cmdTaskComplete'],
   context: ['context', 'cmdContext'], checkpoint: ['checkpoint', 'cmdCheckpoint'],
@@ -65,7 +67,7 @@ try {
     const maxArgs = route === 'task status' ? 2 : 1;
     if (rest.length > maxArgs) throw new Error('Too many arguments; quote titles and messages containing spaces.');
     const argument = rest[0];
-    if (['task create', 'task start', 'task status', 'task complete', 'knowledge search', 'decision record'].includes(route) && !argument?.trim()) throw new Error(`Missing argument. Usage: obsidian-project-framework ${usage[command]}`);
+    if (['task create', 'task start', 'task status', 'task complete', 'task archive', 'task restore', 'knowledge search', 'decision record'].includes(route) && !argument?.trim()) throw new Error(`Missing argument. Usage: obsidian-project-framework ${usage[command]}`);
     if (['init', 'status', 'doctor', 'migrate', 'context', 'task sync'].includes(route) && argument) throw new Error(`Unexpected argument: ${argument}`);
     if (route === 'task status' && !rest[1]) throw new Error('Specify a status defined in the project _statuses.md');
     if (!['brief', 'full', 'task', 'topic'].includes(values.mode)) throw new Error(`Unknown context mode: ${values.mode}`);
@@ -103,7 +105,7 @@ try {
       const commands = await import(`./commands/${module}.mjs`);
       const result = commands[handler]({
         projectRoot, projectId, vaultRoot, paths, taskId, status: rest[1],
-        title: argument, query: argument, message: argument || 'Manual checkpoint',
+        restore: route === 'task restore', title: argument, query: argument, message: argument || 'Manual checkpoint',
         mode: values.mode, topic: values.topic, tokenBudget,
         source: values.source, supersedes: values.supersedes, decidedAt: values['decided-at'],
         key: values.key, summary: values.summary, checks: values.checks, verification: values.verification,

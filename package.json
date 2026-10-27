@@ -19,7 +19,8 @@
     "tests/check.mjs",
     "skill.sh",
     "install.sh",
-    "README.md"
+    "README.md",
+    "README.ru.md"
   ],
   "scripts": {
     "install:global": "node ./bin/skills-install --global",

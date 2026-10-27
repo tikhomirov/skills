@@ -46,7 +46,7 @@ test('init follows the framework and is idempotent, including force and dry-run'
   sameAfter(root, () => run(['init', '--dry-run']));
   assert.ok(!fs.existsSync(paths.base));
   run(['init']);
-  for (const key of ['agentsMd', 'tasksIndex', 'templatesDir', 'attachmentsDir', 'serviceDir', 'decisionsDir', 'nowFile', 'stateFile', 'sessionsDir', 'knowledgeDir', 'reportsDir', 'projectMap', 'decisionsTimeline']) assert.ok(fs.existsSync(paths[key]), key);
+  for (const key of ['agentsMd', 'archiveIndex', 'archiveBase', 'templatesDir', 'attachmentsDir', 'serviceDir', 'decisionsDir', 'nowFile', 'stateFile', 'sessionsDir', 'knowledgeDir', 'reportsDir', 'projectMap', 'decisionsTimeline']) assert.ok(fs.existsSync(paths[key]), key);
   assert.ok(fs.existsSync(paths.tasksBase));
   assert.ok(fs.existsSync(paths.statusesFile));
   const board = fs.readFileSync(paths.tasksBase, 'utf8');
@@ -173,10 +173,6 @@ test('native Kanban drag changes are reconciled without duplicate status events'
   assert.ok(!fs.existsSync(task.filePath)); assert.match(working.filePath, /_in-progress_/);
   assert.ok(readNote(fs.readFileSync(working.filePath, 'utf8')).properties.tags.includes('статус/in-progress'));
   sameAfter(root, () => run(['task', 'sync']));
-  fs.writeFileSync(working.filePath, updateNote(fs.readFileSync(working.filePath, 'utf8'), { status: 'done' }));
-  assert.match(run(['task', 'sync'], false).stderr, /Cannot complete/);
-  fs.writeFileSync(working.filePath, updateNote(fs.readFileSync(working.filePath, 'utf8'), { status: 'in-progress' }));
-  run(['knowledge', 'sync', task.taskId, '--summary', 'Implemented', '--checks', 'Tests passed', '--verification', 'passed']);
   fs.writeFileSync(working.filePath, updateNote(fs.readFileSync(working.filePath, 'utf8'), { status: 'done' }));
   const completed = run(['task', 'sync']).tasks[0]; assert.match(completed.filePath, /_done_/);
   sameAfter(root, () => run(['task', 'sync']));
@@ -331,8 +327,25 @@ test('doctor rejects malformed Kanban YAML and indexes folded summaries correctl
   run(['init']); const task = run(['task', 'create', 'Folded summary']);
   const text = fs.readFileSync(task.filePath, 'utf8').replace(/^summary:.*$/m, 'summary: >-\n  First line\n  second line');
   fs.writeFileSync(task.filePath, text); run(['task', 'sync']);
-  assert.ok(fs.readFileSync(paths.tasksIndex, 'utf8').includes('First line second line'));
+  assert.equal(readNote(fs.readFileSync(task.filePath, 'utf8')).properties.summary, 'First line second line');
+  assert.ok(!fs.existsSync(path.join(paths.tasksDir, '_INDEX.md')));
   fs.appendFileSync(paths.tasksBase, '\ninvalid: [unterminated\n');
   const doctor = JSON.parse(run(['doctor'], false).stdout);
   assert.ok(doctor.checks.some(check => !check.ok && check.name.includes('Kanban YAML')));
+}));
+
+
+test('archive is explicit, indexed, excluded from active board and restores idempotently', () => fixture(({ root, paths, run }) => {
+  run(['init']); const task = run(['task', 'create', 'Archive']); run(['task', 'start', task.taskId]);
+  run(['task', 'archive', task.taskId], false);
+  const working = run(['status']);
+  const file = fs.readdirSync(paths.tasksDir).find(name => name.startsWith(task.taskId));
+  fs.writeFileSync(path.join(paths.tasksDir, file), updateNote(fs.readFileSync(path.join(paths.tasksDir, file), 'utf8'), { status: 'done' }));
+  run(['task', 'sync']); const archived = run(['task', 'archive', task.taskId]);
+  assert.ok(archived.filePath.includes('_archive')); assert.ok(fs.readFileSync(paths.archiveIndex, 'utf8').includes(task.taskId));
+  assert.equal(run(['status']).taskCount, 0);
+  sameAfter(root, () => run(['task', 'archive', task.taskId]));
+  const next = run(['task', 'create', 'Next']); assert.equal(next.taskId, 'TASK-002');
+  run(['task', 'restore', task.taskId]); sameAfter(root, () => run(['task', 'restore', task.taskId]));
+  assert.equal(run(['status']).taskCount, 2);
 }));

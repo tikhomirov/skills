@@ -9,7 +9,7 @@ export function cmdDoctor({ paths }) {
   const checks = [];
   const check = (name, ok) => checks.push({ name, ok: Boolean(ok) });
   check('Project directory exists', fs.existsSync(paths.base));
-  for (const key of ['agentsMd', 'templatesDir', 'attachmentsDir', 'serviceDir', 'tasksDir', 'tasksIndex', 'tasksBase', 'statusesFile', 'decisionsDir', 'memoryDir', 'nowFile', 'stateFile', 'sessionsDir', 'knowledgeDir', 'reportsDir', 'projectMap', 'decisionsTimeline']) {
+  for (const key of ['agentsMd', 'templatesDir', 'attachmentsDir', 'serviceDir', 'tasksDir', 'archiveIndex', 'archiveBase', 'tasksBase', 'statusesFile', 'decisionsDir', 'memoryDir', 'nowFile', 'stateFile', 'sessionsDir', 'knowledgeDir', 'reportsDir', 'projectMap', 'decisionsTimeline']) {
     check(`${key} exists`, fs.existsSync(paths[key]));
   }
   try { assertWithin(paths.base, paths.vaultRoot); }
@@ -30,7 +30,6 @@ export function cmdDoctor({ paths }) {
     } catch (error) { check(`Kanban YAML: ${error.message}`, false); }
   }
   const tasks = listTasks(paths);
-  const index = fs.existsSync(paths.tasksIndex) ? fs.readFileSync(paths.tasksIndex, 'utf8') : '';
   for (const task of tasks) {
     const props = task.properties;
     const status = statuses.find(item => item.id === props.status);
@@ -40,8 +39,7 @@ export function cmdDoctor({ paths }) {
     check(`${task.id}: properties`, Array.isArray(props.related) && Array.isArray(props.depends_on) && Array.isArray(props.sources));
     check(`${task.id}: tags`, Array.isArray(props.tags) && props.tags.includes('задачи') && props.tags.includes(`статус/${props.status}`));
     check(`${task.id}: filename`, validStatus && /^\d{4}-\d{2}-\d{2}$/.test(props.status_changed || '') && path.basename(task.file) === taskFilename(task.id, props.status, props.status_changed));
-    check(`${task.id}: indexed`, index.includes(task.id) && index.includes(path.basename(task.file, '.md')));
-    if (status?.role === 'done') check(`${task.id}: report`, props.knowledge_sync === 'synced' && Boolean(props.report) && fs.existsSync(path.join(paths.reportsDir, task.id + '.md')));
+    if (status?.role === 'done' && props.completion_origin !== 'board') check(`${task.id}: report`, props.knowledge_sync === 'synced' && Boolean(props.report) && fs.existsSync(path.join(paths.reportsDir, task.id + '.md')));
   }
   for (const file of markdownFiles(paths.decisionsDir)) {
     const props = readNote(fs.readFileSync(file, 'utf8')).properties;

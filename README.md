@@ -1,5 +1,7 @@
 # Agent Skills Collection ⚡
 
+[Кратко по-русски](README.ru.md)
+
 A curated collection of production-ready **Agent Skills** for AI coding assistants (**Claude Code**, **Codex**, **OpenCode**, **Pi**, **Cursor**, etc.).
 
 Designed for modern **PHP 8.3+**, **Laravel 11/12/13**, **MoonShine Admin**, **Pest PHP**, **APIs & Webhooks**, **UI/UX Engineering**, and clean **OOP WordPress**.
@@ -155,7 +157,6 @@ Set `OBSIDIAN_VAULT` to avoid repeating `--vault`. Every command supports `--hel
   _вложения/
   _служебное/
   Tasks/                     # Existing Задачи/ is reused instead of duplicated
-    _INDEX.md                # Task + description + status + status date
     _Задачи.base             # Native Obsidian Kanban board, created by default
     TASK-001_backlog_2026-10-27.md
   Решения/                   # Append-only user decisions with dates, sources and task IDs
@@ -179,7 +180,7 @@ The agent workspace is `_agents/` with basic Memory, Knowledge and Reports folde
 
 **`_statuses.md` is the single source of truth:** users may extend, rename, describe and reorder statuses. Agents must read the registry before creating or changing tasks, not rely on a fixed list from a skill or code. Its table defines IDs, labels, roles and descriptions; row order defines Kanban columns. Roles backlog/active/done control creation, work and completion checks, not the number of allowed statuses. Existing registries are preserved even with init --force.
 
-After changing the registry, run `obsidian-project-framework task sync` and `doctor`. Before removing/renaming a used value, explicitly map its tasks; unknown values must never be silently hidden. Dragging a card in Obsidian only updates status: **run task sync afterward** to reconcile filenames, dates, tags, links and indexes. Prepare actual checks and a task report before moving to a status with role done.
+After changing the registry, run `obsidian-project-framework task sync` and `doctor`. Before removing/renaming a used value, explicitly map its tasks; unknown values must never be silently hidden. Dragging a card in Obsidian only updates status: **run task sync afterward** to reconcile filenames, dates, tags, links and indexes. Agent-driven completion requires checks and a report. Human board moves are authoritative: sync preserves the chosen status and flags unverified completion rather than reverting it.
 
 Reports now fingerprint Git file **content** and substantive project Markdown (rules, statuses, knowledge, modules and decisions). Generated indexes, task cards, reports and operational memory are excluded to avoid self-invalidating sync. Editing substantive documentation requires a fresh report. Reports created before this verification format must be regenerated before completion. Returning a completed task to any unfinished role invalidates its old completion evidence.
 
@@ -232,3 +233,8 @@ Do not invent user approvals, accepted decisions or a confirmed module list. Put
 ## 📄 License
 
 MIT © [Aleksei Tikhomirov](https://github.com/tikhomirov)
+
+
+## Project setup and archive
+`project-workshop` is the framework's separate dialogue skill: agree on user-owned rules and module documentation without extending ai-docs-setup. Keep _statuses.md minimal (heading plus table only).
+There is no active task index; open Tasks/_Задачи.base. `task archive TASK-ID` moves a completed card to Tasks/_archive/<year>; `task restore TASK-ID` restores it. Archive has a table database _Архив.base and generated _INDEX.md. No automatic archival, no ID reuse.

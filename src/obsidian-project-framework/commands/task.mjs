@@ -8,7 +8,7 @@ import { getDocumentState } from '../document-state.mjs';
 import { listTasks, findTask, taskFilename, renameTask, refreshIndexes, activeTaskId } from '../task-store.mjs';
 
 export function cmdTaskCreate(options) {
-  const tasks = listTasks(options.paths);
+  const tasks = listTasks(options.paths, true);
   const requestKey = createHash('sha256').update(options.key || options.title.trim()).digest('hex');
   const existing = tasks.find(task => task.properties.request_key === requestKey);
   if (existing) return { success: true, unchanged: true, taskId: existing.id, filePath: existing.file };
@@ -38,13 +38,13 @@ export function cmdTaskStatus(options) {
     && tags.includes('задачи') && tags.includes(`статус/${status}`) && !tags.some(tag => String(tag).startsWith('статус/') && tag !== `статус/${status}`);
   if (previous === status && consistent) return { success: true, unchanged: true, taskId, status, filePath: task.file };
   const previousRole = readStatuses(paths).find(item => item.id === previous)?.role;
-  if (role === 'active') {
+  if (role === 'active' && !options.reconcile) {
     for (const link of task.properties.depends_on || []) {
       const dependency = String(link).match(/TASK-\d+/)?.[0];
       if (!dependency || getStatus(paths, findTask(paths, dependency).properties.status).role !== 'done') throw new Error(`Unfinished dependency: ${link}`);
     }
   }
-  if (role === 'done') {
+  if (role === 'done' && !options.reconcile) {
     if (task.properties.knowledge_sync !== 'synced' || !task.properties.report) {
       throw new Error(`Cannot complete ${taskId}: run obsidian-project-framework knowledge sync ${taskId} --summary "result" --checks "actual checks and results" --verification passed`);
     }
@@ -64,6 +64,7 @@ export function cmdTaskStatus(options) {
   const filePath = path.join(paths.tasksDir, taskFilename(taskId, status, statusDate));
   const changes = {
     status, status_changed: statusDate, updated: now, review: 'pending',
+    ...(options.reconcile && role === 'done' ? { completion_origin: 'board', verification_state: 'user-marked-review-required' } : {}),
     tags: [...new Set(['задачи', ...(Array.isArray(task.properties.tags) ? task.properties.tags : []).filter(tag => !String(tag).startsWith('статус/')), `статус/${status}`])],
   };
   if ((role === 'active' && previousRole !== 'active') || (previousRole === 'done' && role !== 'done')) {

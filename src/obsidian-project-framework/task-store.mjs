@@ -5,17 +5,18 @@ import { generateTasksBase } from './templates.mjs';
 import { refreshDecisionTimeline } from './decisions-store.mjs';
 import { assertWithin, isAgentWritable, markdownFiles, readNote, wikiLink, writeProject } from './utils.mjs';
 
-export function listTasks(paths) {
+export function listTasks(paths, includeArchived = false) {
   if (!fs.existsSync(paths.tasksDir)) return [];
   const tasks = [];
   const ids = new Set();
-  for (const name of fs.readdirSync(paths.tasksDir).sort()) {
-    if (!/^TASK-\d+.*\.md$/.test(name)) continue;
+  const names = fs.readdirSync(paths.tasksDir, { recursive: includeArchived }).sort();
+  for (const name of names) {
+    if (!/^TASK-\d+.*\.md$/.test(path.basename(name))) continue;
     const file = path.join(paths.tasksDir, name);
     assertWithin(file, paths.base);
     const content = fs.readFileSync(file, 'utf8');
     const { properties, body } = readNote(content);
-    const id = properties.id || name.match(/^(TASK-\d+)/)[1];
+    const id = properties.id || path.basename(name).match(/^(TASK-\d+)/)[1];
     if (!/^TASK-\d+$/.test(id)) throw new Error(`Invalid task ID in ${name}`);
     if (ids.has(id)) throw new Error(`Duplicate task ID: ${id}`);
     ids.add(id);
@@ -24,7 +25,7 @@ export function listTasks(paths) {
   return tasks.sort((a, b) => Number(a.id.slice(5)) - Number(b.id.slice(5)));
 }
 export function findTask(paths, id) {
-  const task = listTasks(paths).find(item => item.id === id);
+  const task = listTasks(paths, true).find(item => item.id === id);
   if (!task) throw new Error(`Task not found: ${id}`);
   return task;
 }
@@ -34,16 +35,15 @@ export function taskFilename(id, status, date) {
   }
   return `${id}_${status}_${date}.md`;
 }
-const tableText = value => String(value || '').replace(/\|/g, '\\|').replace(/[\r\n]+/g, ' ');
 export function refreshIndexes(options) {
   if (options.dryRun) return;
   const tasks = listTasks(options.paths);
+  const archived = listTasks(options.paths, true).filter(task => task.file.startsWith(options.paths.archiveDir + path.sep));
+  writeProject(options.paths.archiveIndex, '# Архив задач\n\n| Задача | Название | Статус |\n|---|---|---|\n' + archived.map(task => `| ${wikiLink(task.file, options.paths, task.id)} | ${String(task.properties.title).replaceAll('|', ' ')} | ${task.properties.status} |`).join('\n') + '\n', options);
   const statuses = readStatuses(options.paths);
   writeProject(options.paths.tasksBase, generateTasksBase(path.basename(options.paths.base), path.relative(options.paths.vaultRoot, options.paths.tasksDir).split(path.sep).join('/'), statuses), options);
-  refreshDecisionTimeline(options, tasks);
-  const rows = tasks.map(task => `| ${wikiLink(task.file, options.paths, task.id)} | ${tableText(task.properties.title)} | ${tableText(task.properties.summary)} | ${task.properties.status} | ${task.properties.status_changed} |`);
-  writeProject(options.paths.tasksIndex,
-    '# Задачи — индекс\n\nГенерируется из карточек; не редактировать вручную.\n\n| Задача | Название | Описание | Статус | Дата статуса |\n|---|---|---|---|---|\n' + rows.join('\n') + '\n', options);
+  writeProject(options.paths.archiveBase, `filters:\n  and:\n    - 'file.inFolder(${JSON.stringify(path.relative(options.paths.vaultRoot, options.paths.archiveDir).split(path.sep).join('/'))})'\n    - 'type == "task"'\nviews:\n  - type: table\n    name: Архив задач\n    order:\n      - id\n      - title\n      - status\n      - archived_at\n`, options);
+  refreshDecisionTimeline(options, listTasks(options.paths, true));
   const focus = tasks.filter(task => statuses.find(status => status.id === task.properties.status)?.role !== 'done');
   const oldState = fs.existsSync(options.paths.stateFile) ? fs.readFileSync(options.paths.stateFile, 'utf8') : '';
   const section = focus.map(task => `- ${wikiLink(task.file, options.paths, task.id)}: ${task.properties.title} — ${task.properties.status}`).join('\n') || 'Нет открытых задач.';
@@ -57,6 +57,8 @@ export function renameTask(task, newFile, content, options) {
   assertWithin(task.file, paths.base);
   assertWithin(newFile, paths.base);
   if (newFile !== task.file && fs.existsSync(newFile)) throw new Error(`Destination already exists: ${newFile}`);
+  const oldRelative = path.relative(paths.vaultRoot, task.file).split(path.sep).join('/').replace(/\.md$/, '');
+  const newRelative = path.relative(paths.vaultRoot, newFile).split(path.sep).join('/').replace(/\.md$/, '');
   const oldStem = path.basename(task.file, '.md');
   const newStem = path.basename(newFile, '.md');
   const updates = [];
@@ -65,6 +67,7 @@ export function renameTask(task, newFile, content, options) {
     if (!isAgentWritable(file, paths)) continue;
     const original = file === task.file ? content : fs.readFileSync(file, 'utf8');
     const updated = original.replace(/(!?\[\[)([^\]|#]+)([^\]]*\]\])/g, (match, open, target, tail) => {
+      if (target === oldRelative || target === oldRelative + '.md') return open + newRelative + (target.endsWith('.md') ? '.md' : '') + tail;
       const slash = target.lastIndexOf('/');
       const name = target.slice(slash + 1);
       if (name !== oldStem && name !== oldStem + '.md') return match;
