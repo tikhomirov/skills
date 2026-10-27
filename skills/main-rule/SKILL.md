@@ -15,7 +15,6 @@ disable-model-invocation: true
 - Analyze the problem before seeking a solution
 - See tasks through to completion
 - Fully implement features or tasks
-6. Briefly describe the current state before starting work.
-7. For complex tasks, create a step-by-step plan in .md format with checkboxes.
-8. Always prioritize working code over theoretical explanations.
-9. Once you start a task, complete it fully; do not abandon it unless the user requests otherwise.
+6. For complex tasks, create a step-by-step plan in .md format with checkboxes.
+7. Always prioritize working code over theoretical explanations.
+8. Once you start a task, complete it fully; do not abandon it unless the user requests otherwise.
