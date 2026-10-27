@@ -16,7 +16,7 @@
     "skills",
     "bin",
     "src",
-    "scripts",
+    "tests/check.mjs",
     "skill.sh",
     "install.sh",
     "README.md"
@@ -25,7 +25,7 @@
     "install:global": "node ./bin/skills-install --global",
     "install:local": "node ./bin/skills-install",
     "test": "node --test tests/*/*.test.mjs",
-    "check": "node scripts/check.mjs"
+    "check": "node tests/check.mjs"
   },
   "keywords": [
     "agent-skills",

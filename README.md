@@ -91,16 +91,20 @@ skills/
 │   ├── dandy-style/
 │   ├── dandy-design/
 │   ├── dandy-commit/
+│   ├── obsidian/
+│   ├── obsidian-project-framework/
 │   └── ai-docs-setup/
 ├── bin/                         # Executable entry points only
 │   ├── skills-install
 │   └── obsidian-project-framework
 ├── src/
 │   ├── skills-install/          # Multi-agent skills installer
-│   └── obsidian-project-framework/        # Obsidian project CLI
+│   └── obsidian-project-framework/ # Framework implementation
 │       └── commands/            # Command implementations
-├── tests/                       # CLI and workflow tests
-├── scripts/check.mjs            # JavaScript syntax checks
+├── tests/
+│   ├── check.mjs                # Syntax checker, invoked by npm run check / make check
+│   ├── skills-install/          # Installer tests
+│   └── obsidian-project-framework/ # Framework CLI and workflow tests
 ├── Makefile                     # Developer shortcuts
 ├── install.sh                   # Remote one-line curl installer
 ├── skill.sh                     # Compatibility wrapper for skills-install
@@ -209,6 +213,14 @@ make test            # Run CLI and workflow tests
 make install-local   # Install skills in this repository
 make install-global  # Install skills globally
 ```
+
+`make check` / `npm run check` executes `tests/check.mjs`: it checks JavaScript syntax in the executable entry points, source files and tests via `node --check`. It does not execute the application or replace `make test`. Workflow tests use temporary repositories and vaults, never a user's working project.
+
+### Independent framework evaluations
+
+For parallel evaluations, give each agent a separate output workspace and documentation variant. Treat the target application as read-only: use a sanitized source snapshot, exclude secrets and dependencies, and do not run its scripts, containers or migrations. Keep review artifacts outside both the target application and this repository. Compare source manifests before and after evaluation.
+
+Do not invent user approvals, accepted decisions or a confirmed module list. Put inferred modules in workspace proposals pending confirmation. Reports should cite source paths and distinguish verified facts, hypotheses, unavailable checks and reproducible framework defects.
 
 ## 📄 License
 
