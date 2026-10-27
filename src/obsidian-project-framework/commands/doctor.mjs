@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { parse } from 'yaml';
 import { readStatuses } from '../statuses.mjs';
 import { assertWithin, markdownFiles, readNote } from '../utils.mjs';
 import { listTasks, taskFilename } from '../task-store.mjs';
@@ -20,10 +21,13 @@ export function cmdDoctor({ paths }) {
   try { statuses = readStatuses(paths); check('_statuses.md is valid', true); }
   catch (error) { check(error.message, false); return { allOk: false, checks }; }
   if (fs.existsSync(paths.tasksBase)) {
-    const board = fs.readFileSync(paths.tasksBase, 'utf8');
-    check('Native Kanban view configured', /type: kanban/.test(board) && /property: note\.status/.test(board));
-    const order = board.match(/groupOrder:\s*\n((?:\s*- [a-z][a-z0-9-]*\s*\n)+)/)?.[1].trim().split('\n').map(line => line.trim().slice(2).trim()) || [];
-    check('Kanban columns match _statuses.md', JSON.stringify(order) === JSON.stringify(statuses.map(status => status.id)));
+    try {
+      const board = parse(fs.readFileSync(paths.tasksBase, 'utf8'));
+      const view = board?.views?.find(view => view.type === 'kanban');
+      check('Native Kanban view configured', view?.groupBy?.property === 'note.status');
+      check('Kanban columns match _statuses.md', JSON.stringify(view?.groupOrder) === JSON.stringify(statuses.map(status => status.id)));
+      check('Kanban task filter configured', Array.isArray(board?.filters?.and) && board.filters.and.includes('type == "task"') && board.filters.and.includes(`file.inFolder(${JSON.stringify(path.relative(paths.vaultRoot, paths.tasksDir).split(path.sep).join('/'))})`));
+    } catch (error) { check(`Kanban YAML: ${error.message}`, false); }
   }
   const tasks = listTasks(paths);
   const index = fs.existsSync(paths.tasksIndex) ? fs.readFileSync(paths.tasksIndex, 'utf8') : '';

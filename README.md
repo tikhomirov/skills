@@ -8,10 +8,13 @@ Designed for modern **PHP 8.3+**, **Laravel 11/12/13**, **MoonShine Admin**, **P
 
 ## 📦 Included Skills and Frameworks
 
+Apply `improvement` before and after changes: verify recommendations, prefer the smallest useful patch, evaluate neighboring contracts and stage risky migrations explicitly.
+
 | Skill | Description | Location |
 |---|---|---|
 | **`obsidian`** | Precise instructions for Obsidian tools and formats: Markdown, Properties/YAML, wiki links, Bases, Canvas and the application's CLI. | `skills/obsidian` |
 | **`obsidian-project-framework`** | Integrated project framework: skills, instructions, templates and executable helpers for tasks, user decisions, memory and reports. This directory contains its agent entry skill. | `skills/obsidian-project-framework` |
+| **`improvement`** | Reasoned improvements: validate findings, constrain scope, assess adjacent behavior before/after changes and stage risky transitions. | `skills/improvement` |
 | **`main-rule`** | Baseline senior development rules: simplicity, minimal code volume, step-by-step plans, and working code first. | `skills/main-rule` |
 | **`moonshine`** | Comprehensive toolkit for building, configuring, and extending Laravel **MoonShine** admin panels (MoonShine 4.x & 3.x). Deep-dive references for ModelResources, CRUD pages, relationships, FormBuilder, TableBuilder, and Blade components. | `skills/moonshine` |
 | **`laraway`** | Core philosophy, conventions, and pragmatic architecture of **The Laravel Way** (laraway.github.io, Laracasts, community practices). Anti-pattern prevention (no cargo-cult repositories, no N+1, lean controllers, native PHP vs magic balance). | `skills/laraway` |
@@ -177,6 +180,10 @@ The agent workspace is `_agents/` with basic Memory, Knowledge and Reports folde
 **`_statuses.md` is the single source of truth:** users may extend, rename, describe and reorder statuses. Agents must read the registry before creating or changing tasks, not rely on a fixed list from a skill or code. Its table defines IDs, labels, roles and descriptions; row order defines Kanban columns. Roles backlog/active/done control creation, work and completion checks, not the number of allowed statuses. Existing registries are preserved even with init --force.
 
 After changing the registry, run `obsidian-project-framework task sync` and `doctor`. Before removing/renaming a used value, explicitly map its tasks; unknown values must never be silently hidden. Dragging a card in Obsidian only updates status: **run task sync afterward** to reconcile filenames, dates, tags, links and indexes. Prepare actual checks and a task report before moving to a status with role done.
+
+Reports now fingerprint Git file **content** and substantive project Markdown (rules, statuses, knowledge, modules and decisions). Generated indexes, task cards, reports and operational memory are excluded to avoid self-invalidating sync. Editing substantive documentation requires a fresh report. Reports created before this verification format must be regenerated before completion. Returning a completed task to any unfinished role invalidates its old completion evidence.
+
+The CLI uses the `yaml` package to parse frontmatter and validate board YAML; install dependencies with `npm ci` when running from a Git clone. `doctor` checks syntax/configuration, not visual rendering or the truth of recorded test results.
 
 **Decisions are append-only:** record what the user decided, when, the source and relevant stable task IDs. Never edit/delete/rename past events; amendments create a new event linked with supersedes. The live timeline and links to current task filenames are generated in `_agents/Knowledge/Решения — таймлайн.md`. Task status changes do not rewrite module documentation or historical decisions.
 Tasks have mandatory tags, descriptions, related tasks and dependencies. A status change renames the file, updates its status/date/tag and repairs task links, indexes and memory. The date in the filename is the UTC date of the status change, not the last text edit.

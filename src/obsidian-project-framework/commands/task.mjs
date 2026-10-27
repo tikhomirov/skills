@@ -4,6 +4,7 @@ import path from 'node:path';
 import { getGitHead, getGitState, readNote, updateNote, wikiLink, writeProject } from '../utils.mjs';
 import { generateTaskTemplate } from '../templates.mjs';
 import { firstStatus, getStatus, readStatuses } from '../statuses.mjs';
+import { getDocumentState } from '../document-state.mjs';
 import { listTasks, findTask, taskFilename, renameTask, refreshIndexes, activeTaskId } from '../task-store.mjs';
 
 export function cmdTaskCreate(options) {
@@ -51,6 +52,9 @@ export function cmdTaskStatus(options) {
     if (!fs.existsSync(reportFile)) throw new Error('Task report is missing');
     const report = readNote(fs.readFileSync(reportFile, 'utf8'));
     if (!['passed', 'not-required'].includes(report.properties.verification)) throw new Error('Report checks have not passed or been explicitly marked not required');
+    if (report.properties.document_state !== getDocumentState(paths)) {
+      throw new Error('Project documentation changed or the report predates document verification; repeat knowledge sync before completing the task');
+    }
     if (report.properties.git_state !== getGitState(projectRoot, task.properties.git_baseline).key) {
       throw new Error('Code changed after the report was recorded; repeat checks and knowledge sync before completing the task');
     }
@@ -62,7 +66,7 @@ export function cmdTaskStatus(options) {
     status, status_changed: statusDate, updated: now, review: 'pending',
     tags: [...new Set(['задачи', ...(Array.isArray(task.properties.tags) ? task.properties.tags : []).filter(tag => !String(tag).startsWith('статус/')), `статус/${status}`])],
   };
-  if (role === 'active' && previousRole !== 'active') {
+  if ((role === 'active' && previousRole !== 'active') || (previousRole === 'done' && role !== 'done')) {
     changes.git_baseline = getGitHead(projectRoot);
     changes.knowledge_sync = 'pending';
     changes.report = null;

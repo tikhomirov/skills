@@ -3,6 +3,7 @@ import path from 'node:path';
 import os from 'node:os';
 import { randomUUID, createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
+import { parse } from 'yaml';
 
 export function findProjectRoot(start = process.cwd()) {
   let current = path.resolve(start);
@@ -101,8 +102,10 @@ export function getGitState(root, baseline) {
   const staged = split(git(root, ['diff', '--cached', '--name-only', '-z']));
   const changedFiles = [...new Set([...committed, ...working, ...staged])].sort();
   const key = createHash('sha256').update(JSON.stringify({ baseline, head, files: changedFiles.map(file => {
-    const stat = fs.lstatSync(path.join(root, file), { throwIfNoEntry: false });
-    return [file, stat?.size, stat?.mtimeMs];
+    const full = path.join(root, file);
+    const stat = fs.lstatSync(full, { throwIfNoEntry: false });
+    return [file, !stat ? null : stat.isSymbolicLink() ? ['symlink', fs.readlinkSync(full)]
+      : stat.isFile() ? createHash('sha256').update(fs.readFileSync(full)).digest('hex') : 'directory'];
   }) })).digest('hex');
   return { head, changedFiles, key };
 }
@@ -116,28 +119,11 @@ export function markdownFiles(dir) {
   }
   return result;
 }
-function scalar(value) {
-  const text = value.trim();
-  if (!text) return '';
-  try { return JSON.parse(text); } catch { return text.replace(/^'(.*)'$/, '$1').replace(/''/g, "'"); }
-}
 export function readNote(content) {
   const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/);
-  const properties = {};
-  if (!match) return { properties, body: content };
-  let listKey;
-  for (const line of match[1].split(/\r?\n/)) {
-    const field = line.match(/^([\w-]+):\s*(.*)$/);
-    if (field) {
-      listKey = field[1]; properties[listKey] = scalar(field[2]);
-      if (/^\[.*\]$/.test(field[2]) && !Array.isArray(properties[listKey])) {
-        properties[listKey] = field[2].slice(1, -1).split(',').filter(Boolean).map(scalar);
-      }
-    } else if (listKey && /^\s*-\s+/.test(line)) {
-      if (!Array.isArray(properties[listKey])) properties[listKey] = [];
-      properties[listKey].push(scalar(line.replace(/^\s*-\s+/, '')));
-    }
-  }
+  if (!match) return { properties: {}, body: content };
+  const properties = parse(match[1]) ?? {};
+  if (typeof properties !== 'object' || Array.isArray(properties)) throw new Error('Note frontmatter must be a YAML mapping');
   return { properties, body: content.slice(match[0].length) };
 }
 export function updateNote(content, changes) {

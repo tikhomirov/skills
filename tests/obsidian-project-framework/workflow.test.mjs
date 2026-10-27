@@ -301,3 +301,38 @@ test('writes cannot escape through a symlink and invalid explicit vault does not
   const result = spawnSync(cli, ['init', '--vault', path.join(vault, 'missing')], { encoding: 'utf8' });
   assert.equal(result.status, 1); assert.match(result.stderr, /Vault directory not found/);
 }));
+
+
+test('reopening through backlog invalidates the previous completion report', () => fixture(({ run }) => {
+  run(['init']); const task = run(['task', 'create', 'Reopen']); run(['task', 'start', task.taskId]);
+  run(['knowledge', 'sync', task.taskId, '--summary', 'Done', '--checks', 'Tests passed', '--verification', 'passed']);
+  run(['task', 'complete', task.taskId]); run(['task', 'status', task.taskId, 'backlog']);
+  assert.match(run(['task', 'complete', task.taskId], false).stderr, /Cannot complete/);
+}));
+
+test('substantive vault edits invalidate reports but memory and generated navigation do not', () => fixture(({ paths, run }) => {
+  run(['init']); const task = run(['task', 'create', 'Docs']); run(['task', 'start', task.taskId]);
+  const args = ['knowledge', 'sync', task.taskId, '--summary', 'Updated docs', '--checks', 'Links checked', '--verification', 'passed'];
+  run(args); fs.writeFileSync(path.join(paths.knowledgeDir, 'Research.md'), '# New research\n');
+  assert.match(run(['task', 'complete', task.taskId], false).stderr, /documentation changed/);
+  run(args); fs.appendFileSync(paths.nowFile, '\nNext step.\n');
+  run(['task', 'complete', task.taskId]);
+}));
+
+test('same-sized Git edits with restored timestamps invalidate evidence', () => fixture(({ repo, run }) => {
+  run(['init']); const task = run(['task', 'create', 'Content hash']); run(['task', 'start', task.taskId]);
+  const file = path.join(repo, 'app.js'); fs.writeFileSync(file, 'console.log(2);\n');
+  const args = ['knowledge', 'sync', task.taskId, '--summary', 'Changed', '--checks', 'Tests passed', '--verification', 'passed'];
+  run(args); const stat = fs.statSync(file); fs.writeFileSync(file, 'console.log(3);\n'); fs.utimesSync(file, stat.atime, stat.mtime);
+  assert.match(run(['task', 'complete', task.taskId], false).stderr, /Code changed/);
+}));
+
+test('doctor rejects malformed Kanban YAML and indexes folded summaries correctly', () => fixture(({ paths, run }) => {
+  run(['init']); const task = run(['task', 'create', 'Folded summary']);
+  const text = fs.readFileSync(task.filePath, 'utf8').replace(/^summary:.*$/m, 'summary: >-\n  First line\n  second line');
+  fs.writeFileSync(task.filePath, text); run(['task', 'sync']);
+  assert.ok(fs.readFileSync(paths.tasksIndex, 'utf8').includes('First line second line'));
+  fs.appendFileSync(paths.tasksBase, '\ninvalid: [unterminated\n');
+  const doctor = JSON.parse(run(['doctor'], false).stdout);
+  assert.ok(doctor.checks.some(check => !check.ok && check.name.includes('Kanban YAML')));
+}));

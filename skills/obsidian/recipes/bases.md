@@ -10,7 +10,7 @@ description: Create and edit Obsidian Bases (.base files) with views, filters, f
 1. **Create the file**: Create a `.base` file in the vault with valid YAML content
 2. **Define scope**: Add `filters` to select which notes appear (by tag, folder, property, or date)
 3. **Add formulas** (optional): Define computed properties in the `formulas` section
-4. **Configure views**: Add one or more views (`table`, `cards`, `list`, or `map`) with `order` specifying which properties to display
+4. **Configure views**: Add one or more views (`table`, `cards`, `list`, `map`, or native `kanban` in Obsidian 1.14+) with `order` specifying which properties to display
 5. **Validate**: Verify the file is valid YAML with no syntax errors. Check that all referenced properties and formulas exist. Common issues: unquoted strings containing special YAML characters, mismatched quotes in formula expressions, referencing `formula.X` without defining `X` in `formulas`
 6. **Test in Obsidian**: Open the `.base` file in Obsidian to confirm the view renders correctly. If it shows a YAML error, check quoting rules below
 
@@ -47,7 +47,7 @@ summaries:
 
 # Define one or more views
 views:
-  - type: table | cards | list | map
+  - type: table | cards | list | map | kanban
     name: "View Name"
     limit: 10                    # Optional: limit results
     groupBy:                     # Optional: group results
@@ -501,4 +501,4 @@ formulas:
 
 ## Native Kanban (Obsidian 1.14+)
 
-For the built-in Kanban view, read [official Kanban documentation](references/native-kanban.md) and [current official Bases syntax](references/official-bases-syntax.md). These references supplement the older view list in this skill. Requires Obsidian 1.14+. Use native `type: kanban`, group by an editable note property, and use `groupOrder` for column order. Moving a card updates that note property. Do not use the community Kanban plugin or its Markdown board format for a native Bases board. Check the installed Obsidian version before using this layout.
+For the built-in Kanban view, read [official Kanban documentation](../references/native-kanban.md) and [current official Bases syntax](../references/official-bases-syntax.md). These references supplement the older view list in this skill. Requires Obsidian 1.14+. Use native `type: kanban`, group by an editable note property, and use `groupOrder` for column order. Moving a card updates that note property. Do not use the community Kanban plugin or its Markdown board format for a native Bases board. Check the installed Obsidian version before using this layout.

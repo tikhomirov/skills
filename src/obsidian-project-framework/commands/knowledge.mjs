@@ -4,6 +4,7 @@ import path from 'node:path';
 import { getGitState, markdownFiles, readNote, updateNote, wikiLink, writeProject } from '../utils.mjs';
 import { activeTaskId, findTask, refreshIndexes } from '../task-store.mjs';
 import { getStatus } from '../statuses.mjs';
+import { getDocumentState } from '../document-state.mjs';
 
 export function cmdKnowledgeSearch({ paths, query }) {
   const needle = query.toLocaleLowerCase();
@@ -25,8 +26,9 @@ export function cmdKnowledgeSync(options) {
   const gitState = getGitState(projectRoot, baseline);
   const { head, changedFiles } = gitState;
   const reportFile = path.join(paths.reportsDir, taskId + '.md');
+  const documentState = getDocumentState(paths);
   const signature = createHash('sha256').update(JSON.stringify({
-    summary: options.summary, checks: options.checks, verification: options.verification, gitState: gitState.key,
+    summary: options.summary, checks: options.checks, verification: options.verification, gitState: gitState.key, documentState,
   })).digest('hex');
   if (fs.existsSync(reportFile)) {
     const previous = readNote(fs.readFileSync(reportFile, 'utf8')).properties;
@@ -39,7 +41,7 @@ export function cmdKnowledgeSync(options) {
     type: 'report', task: wikiLink(task.file, paths, taskId), summary: options.summary,
     status: 'recorded', verification: options.verification,
     updated: now, tags: ['отчеты', 'задачи'], sources: changedFiles, review: 'pending',
-    git_baseline: baseline || null, git_head: head, git_state: gitState.key, sync_key: signature,
+    git_baseline: baseline || null, git_head: head, git_state: gitState.key, document_state: documentState, sync_key: signature,
   });
   writeProject(reportFile, content, options);
   const taskWithResult = task.content.replace(/(## Результат\n)[\s\S]*?(?=\n## |$)/, (_match, heading) => `${heading}${options.summary}\n`);
