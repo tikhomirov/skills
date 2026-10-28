@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { assertWithin, ensureDir, safeWrite, writeProject } from '../utils.mjs';
-import { generateAgentsMd, generateTasksBase, generateNowMd, generateStateMd, generateTaskTemplate, generateDocumentTemplate } from '../templates.mjs';
+import { generateAgentsMd, generateTasksBase, tasksBaseIsCurrent, generateNowMd, generateStateMd, generateTaskTemplate, generateDocumentTemplate } from '../templates.mjs';
 import { generateStatusDocument, readStatuses } from '../statuses.mjs';
 import { listTasks, refreshIndexes } from '../task-store.mjs';
 
@@ -30,7 +30,9 @@ export function cmdInit(options) {
   for (const [file, text] of files) {
     // --force may refresh generated navigation/templates, never overwrite project rules or memory.
     const generated = file === paths.tasksBase || file.startsWith(paths.templatesDir + path.sep);
-    if (!fs.existsSync(file) || file === paths.tasksBase || (force && generated)) writeProject(file, text, options);
+    const boardOutdated = file === paths.tasksBase && fs.existsSync(file)
+      && !tasksBaseIsCurrent(fs.readFileSync(file, 'utf8'), path.relative(paths.vaultRoot, paths.tasksDir).split(path.sep).join('/'), statuses);
+    if (!fs.existsSync(file) || boardOutdated || (force && generated && file !== paths.tasksBase)) writeProject(file, text, options);
   }
   const repoAgents = path.join(projectRoot, 'AGENTS.md');
   if (!fs.existsSync(repoAgents)) {

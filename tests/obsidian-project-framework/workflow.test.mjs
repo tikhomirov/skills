@@ -349,3 +349,35 @@ test('archive is explicit, indexed, excluded from active board and restores idem
   run(['task', 'restore', task.taskId]); sameAfter(root, () => run(['task', 'restore', task.taskId]));
   assert.equal(run(['status']).taskCount, 2);
 }));
+
+test('board re-saved by Obsidian with `status` is accepted and not overwritten', () => fixture(({ root, paths, run }) => {
+  run(['init']); run(['task', 'create', 'Board']);
+  const resaved = fs.readFileSync(paths.tasksBase, 'utf8').replace('property: note.status', 'property: status') + '    columnWidth: 300\n';
+  fs.writeFileSync(paths.tasksBase, resaved);
+  run(['task', 'sync']); run(['task', 'create', 'Board 2']); run(['init']);
+  assert.equal(fs.readFileSync(paths.tasksBase, 'utf8'), resaved);
+  assert.equal(run(['doctor']).allOk, true);
+  fs.writeFileSync(paths.tasksBase, resaved.replace('      - done\n', ''));
+  run(['task', 'sync']);
+  assert.match(fs.readFileSync(paths.tasksBase, 'utf8'), /groupOrder:\n      - backlog\n      - in-progress\n      - done/);
+}));
+
+test('report sources list committed changes only; uncommitted files are listed separately', () => fixture(({ repo, run, git }) => {
+  run(['init']); const task = run(['task', 'create', 'Sources']); run(['task', 'start', task.taskId]);
+  fs.writeFileSync(path.join(repo, 'feature.js'), '1;\n'); git(['add', 'feature.js']); git(['commit', '-m', 'feature']);
+  fs.writeFileSync(path.join(repo, 'unrelated.txt'), 'x\n');
+  const sync = run(['knowledge', 'sync', task.taskId, '--summary', 'Done', '--checks', 'ok', '--verification', 'passed']);
+  const report = readNote(fs.readFileSync(sync.reportFile, 'utf8'));
+  assert.deepEqual(report.properties.sources, ['feature.js']);
+  assert.ok(report.properties.uncommitted_count >= 1); // init also leaves AGENTS.md and .project-id untracked
+  assert.ok(report.body.includes('"unrelated.txt"'));
+  assert.ok(sync.changedFiles.includes('unrelated.txt'));
+}));
+
+test('decision file name uses the decision date and the body keeps the source', () => fixture(({ run }) => {
+  run(['init']); const task = run(['task', 'create', 'Decision date']);
+  const recorded = run(['decision', 'record', 'Старое решение', '--task', task.taskId, '--summary', 'Итог', '--source', 'Сообщение пользователя 15.01', '--decided-at', '2026-01-15']);
+  assert.match(path.basename(recorded.filePath), /^2026-01-15_DEC-/);
+  const body = readNote(fs.readFileSync(recorded.filePath, 'utf8')).body;
+  assert.match(body, /## Источник подтверждения\nСообщение пользователя 15\.01\n\nДата решения: 2026-01-15\./);
+}));

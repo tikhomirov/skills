@@ -4,6 +4,7 @@ import { parse } from 'yaml';
 import { readStatuses } from '../statuses.mjs';
 import { assertWithin, markdownFiles, readNote } from '../utils.mjs';
 import { listTasks, taskFilename } from '../task-store.mjs';
+import { KANBAN_STATUS_PROPERTIES } from '../templates.mjs';
 
 export function cmdDoctor({ paths }) {
   const checks = [];
@@ -24,7 +25,7 @@ export function cmdDoctor({ paths }) {
     try {
       const board = parse(fs.readFileSync(paths.tasksBase, 'utf8'));
       const view = board?.views?.find(view => view.type === 'kanban');
-      check('Native Kanban view configured', view?.groupBy?.property === 'note.status');
+      check('Native Kanban view configured', KANBAN_STATUS_PROPERTIES.includes(view?.groupBy?.property));
       check('Kanban columns match _statuses.md', JSON.stringify(view?.groupOrder) === JSON.stringify(statuses.map(status => status.id)));
       check('Kanban task filter configured', Array.isArray(board?.filters?.and) && board.filters.and.includes('type == "task"') && board.filters.and.includes(`file.inFolder(${JSON.stringify(path.relative(paths.vaultRoot, paths.tasksDir).split(path.sep).join('/'))})`));
     } catch (error) { check(`Kanban YAML: ${error.message}`, false); }

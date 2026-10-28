@@ -28,8 +28,9 @@ export function cmdDecisionRecord(options) {
   }
   const now = new Date().toISOString();
   const decisionId = 'DEC-' + key.slice(0, 16);
-  const filePath = path.join(paths.decisionsDir, `${now.slice(0, 10)}_${decisionId}.md`);
-  const content = updateNote(`\n# ${title}\n\n## Решение пользователя\n${summary}\n\n## Источник подтверждения\n${source}\n\n## Задачи\n${taskIds.map(id => '- ' + id).join('\n')}\n\n## История\n${previous ? 'Заменяет ' + wikiLink(previous.file, paths, previous.properties.id) + '. Оригинал не изменяется.' : 'Первичная запись.'}\n`, {
+  // File name carries the actual decision date; the recording time stays in recorded_at.
+  const filePath = path.join(paths.decisionsDir, `${options.decidedAt || now.slice(0, 10)}_${decisionId}.md`);
+  const content = updateNote(`\n# ${title}\n\n## Решение пользователя\n${summary}\n\n## Источник подтверждения\n${source.trim()}\n\nДата решения: ${options.decidedAt || now.slice(0, 10)}. Записано: ${now}.\n\n## Задачи\n${taskIds.map(id => '- ' + id).join('\n')}\n\n## История\n${previous ? 'Заменяет ' + wikiLink(previous.file, paths, previous.properties.id) + '. Оригинал не изменяется.' : 'Первичная запись.'}\n`, {
     id: decisionId, type: 'decision', ...evidence, decided_at: options.decidedAt || now, recorded_at: now,
     approved_at: options.decidedAt || now, approved_by: 'user', approval_source: source, review: 'approved',
     tags: ['решения'], request_key: key, evidence_key: evidenceKey,

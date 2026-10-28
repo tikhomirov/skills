@@ -1,5 +1,6 @@
 import { updateNote } from './utils.mjs';
 import { DEFAULT_STATUSES } from './constants.mjs';
+import { parse as parseYaml } from 'yaml';
 
 export function generateAgentsMd(projectId) {
   return `# AGENTS.md — ${projectId}
@@ -29,6 +30,18 @@ export function generateAgentsMd(projectId) {
 `;
 }
 
+// Obsidian may save `status` instead of `note.status`; both group by the same note property.
+export const KANBAN_STATUS_PROPERTIES = ['note.status', 'status'];
+export function tasksBaseIsCurrent(text, folder, statuses = DEFAULT_STATUSES) {
+  try {
+    const board = parseYaml(text);
+    const view = board?.views?.find(item => item.type === 'kanban');
+    return KANBAN_STATUS_PROPERTIES.includes(view?.groupBy?.property)
+      && JSON.stringify(view?.groupOrder) === JSON.stringify(statuses.map(status => status.id))
+      && Array.isArray(board?.filters?.and) && board.filters.and.includes('type == "task"')
+      && board.filters.and.includes(`file.inFolder(${JSON.stringify(folder)})`);
+  } catch { return false; }
+}
 export function generateTasksBase(projectId, folder, statuses = DEFAULT_STATUSES) {
   return `filters:
   and:

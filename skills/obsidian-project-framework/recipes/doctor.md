@@ -7,7 +7,7 @@ obsidian-project-framework doctor --json
 
 Проверить:
 - каноническую структуру с `_agents/{Memory,Knowledge,Reports}` и отсутствие старых HUMAN/AGENT/Agents/Memory/Knowledge/Отчеты;
-- AGENTS, шаблоны, память, архивную БД/индекс, карту, рабочий таймлайн и обязательную канбан-доску _Задачи.base (type: kanban, note.status, groupOrder из _statuses.md). Модули/ и API/ не требуются;
+- AGENTS, шаблоны, память, архивную БД/индекс, карту, рабочий таймлайн и обязательную канбан-доску _Задачи.base (type: kanban, note.status или status — так её сохраняет Obsidian, groupOrder из _statuses.md). Модули/ и API/ не требуются;
 - валидность корневого _statuses.md, соответствие доски его порядку и отсутствие неописанных статусов;
 - уникальность id карточек, обязательные свойства, статусы и теги;
 - соответствие имени карточки id/status/status_changed;

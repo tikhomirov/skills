@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { readStatuses } from './statuses.mjs';
-import { generateTasksBase } from './templates.mjs';
+import { generateTasksBase, tasksBaseIsCurrent } from './templates.mjs';
 import { refreshDecisionTimeline } from './decisions-store.mjs';
 import { assertWithin, isAgentWritable, markdownFiles, readNote, wikiLink, writeProject } from './utils.mjs';
 
@@ -41,7 +41,10 @@ export function refreshIndexes(options) {
   const archived = listTasks(options.paths, true).filter(task => task.file.startsWith(options.paths.archiveDir + path.sep));
   writeProject(options.paths.archiveIndex, '# Архив задач\n\n| Задача | Название | Статус |\n|---|---|---|\n' + archived.map(task => `| ${wikiLink(task.file, options.paths, task.id)} | ${String(task.properties.title).replaceAll('|', ' ')} | ${task.properties.status} |`).join('\n') + '\n', options);
   const statuses = readStatuses(options.paths);
-  writeProject(options.paths.tasksBase, generateTasksBase(path.basename(options.paths.base), path.relative(options.paths.vaultRoot, options.paths.tasksDir).split(path.sep).join('/'), statuses), options);
+  const boardFolder = path.relative(options.paths.vaultRoot, options.paths.tasksDir).split(path.sep).join('/');
+  // Keep a board that Obsidian re-saved (e.g. `status` instead of `note.status`); regenerate only a missing or outdated one.
+  const board = fs.existsSync(options.paths.tasksBase) ? fs.readFileSync(options.paths.tasksBase, 'utf8') : null;
+  if (board === null || !tasksBaseIsCurrent(board, boardFolder, statuses)) writeProject(options.paths.tasksBase, generateTasksBase(path.basename(options.paths.base), boardFolder, statuses), options);
   writeProject(options.paths.archiveBase, `filters:\n  and:\n    - 'file.inFolder(${JSON.stringify(path.relative(options.paths.vaultRoot, options.paths.archiveDir).split(path.sep).join('/'))})'\n    - 'type == "task"'\nviews:\n  - type: table\n    name: Архив задач\n    order:\n      - id\n      - title\n      - status\n      - archived_at\n`, options);
   refreshDecisionTimeline(options, listTasks(options.paths, true));
   const focus = tasks.filter(task => statuses.find(status => status.id === task.properties.status)?.role !== 'done');

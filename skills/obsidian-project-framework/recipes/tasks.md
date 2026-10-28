@@ -14,7 +14,7 @@ obsidian-project-framework task restore TASK-001
 
 ## Доска и статус
 - `_Задачи.base` — native Kanban Obsidian 1.14+ (Bases), не table/cards и не сторонний плагин. Все активные карточки type: task из папки задач; archived исключены.
-- Группировка note.status, порядок колонок из _statuses.md. Начально backlog/in-progress/done; заголовки — значения status, title/summary/id/tags — свойства карточки.
+- Группировка note.status (Obsidian может сохранить как status — это то же свойство), порядок колонок из _statuses.md. CLI не перезаписывает корректную доску, пересоздаёт только отсутствующую или устаревшую. Начально backlog/in-progress/done; заголовки — значения status, title/summary/id/tags — свойства карточки.
 - Перенос человека меняет status. Sync сохраняет его, согласует имя, дату, тег, рабочие ссылки и память; модули/историю решений не переписывает. Время sync — обнаружение, не точное время переноса.
 - Ручной Done без доказательств помечается completion_origin: board, verification_state: user-marked-review-required. Не возвращать карточку назад и не утверждать, что тесты прошли.
 - Агентское complete требует актуальный отчёт; start проверяет зависимости. Возврат из done сбрасывает готовность отчёта; смена active→active сохраняет baseline. NOW — фокус, не запрет нескольких активных задач.

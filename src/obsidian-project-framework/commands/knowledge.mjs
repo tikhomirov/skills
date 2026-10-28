@@ -24,7 +24,7 @@ export function cmdKnowledgeSync(options) {
   // Git failures must stop synchronization, never manufacture successful evidence.
   const baseline = task.properties.git_baseline;
   const gitState = getGitState(projectRoot, baseline);
-  const { head, changedFiles } = gitState;
+  const { head, changedFiles, committedFiles, uncommittedFiles } = gitState;
   const reportFile = path.join(paths.reportsDir, taskId + '.md');
   const documentState = getDocumentState(paths);
   const signature = createHash('sha256').update(JSON.stringify({
@@ -33,14 +33,14 @@ export function cmdKnowledgeSync(options) {
   if (fs.existsSync(reportFile)) {
     const previous = readNote(fs.readFileSync(reportFile, 'utf8')).properties;
     if (previous.sync_key === signature && task.properties.knowledge_sync === 'synced') {
-      return { success: true, unchanged: true, taskId, syncStatus: 'synced', reportFile, changedFiles };
+      return { success: true, unchanged: true, taskId, syncStatus: 'synced', reportFile, changedFiles, committedFiles, uncommittedFiles };
     }
   }
   const now = new Date().toISOString();
-  const content = updateNote(`\n# Отчёт — ${taskId}\n\nЗадача: ${wikiLink(task.file, paths, taskId)}\n\n## Результат и документация\n${options.summary}\n\n## Проверки и результаты\n${options.checks}\n\n## Git\nBaseline: ${baseline || 'нет коммита'}. HEAD: ${head || 'нет коммита'}.\n\n## Изменённые пути\n${changedFiles.map(file => '- ' + JSON.stringify(file)).join('\n') || 'Нет изменений.'}\n\n## Ограничения\nЭто запись предоставленных агентом результатов, не автоматическая проверка семантики кода и не одобрение пользователя. Содержимое diff и секреты не копируются.\n`, {
+  const content = updateNote(`\n# Отчёт — ${taskId}\n\nЗадача: ${wikiLink(task.file, paths, taskId)}\n\n## Результат и документация\n${options.summary}\n\n## Проверки и результаты\n${options.checks}\n\n## Git\nBaseline: ${baseline || 'нет коммита'}. HEAD: ${head || 'нет коммита'}.\n\n## Изменённые пути (коммиты после baseline)\n${committedFiles.map(file => '- ' + JSON.stringify(file)).join('\n') || 'Нет изменений.'}\n\n## Незакоммиченные файлы рабочей папки\nНе входят в sources: могут не относиться к задаче. Учитываются только для проверки актуальности отчёта.\n${uncommittedFiles.map(file => '- ' + JSON.stringify(file)).join('\n') || 'Нет.'}\n\n## Ограничения\nЭто запись предоставленных агентом результатов, не автоматическая проверка семантики кода и не одобрение пользователя. Содержимое diff и секреты не копируются.\n`, {
     type: 'report', task: wikiLink(task.file, paths, taskId), summary: options.summary,
     status: 'recorded', verification: options.verification,
-    updated: now, tags: ['отчеты', 'задачи'], sources: changedFiles, review: 'pending',
+    updated: now, tags: ['отчеты', 'задачи'], sources: committedFiles, uncommitted_count: uncommittedFiles.length, review: 'pending',
     git_baseline: baseline || null, git_head: head, git_state: gitState.key, document_state: documentState, sync_key: signature,
   });
   writeProject(reportFile, content, options);
@@ -50,5 +50,5 @@ export function cmdKnowledgeSync(options) {
   }) + `\n- ${now}: отчёт и результаты проверок — ${wikiLink(reportFile, paths, taskId)}.\n`;
   writeProject(task.file, updated, options);
   refreshIndexes(options);
-  return { success: true, dryRun: Boolean(dryRun), taskId, syncStatus: 'synced', reportFile, changedFiles };
+  return { success: true, dryRun: Boolean(dryRun), taskId, syncStatus: 'synced', reportFile, changedFiles, committedFiles, uncommittedFiles };
 }

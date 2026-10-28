@@ -101,13 +101,16 @@ export function getGitState(root, baseline) {
   const working = split(git(root, ['ls-files', '--modified', '--deleted', '--others', '--exclude-standard', '-z']));
   const staged = split(git(root, ['diff', '--cached', '--name-only', '-z']));
   const changedFiles = [...new Set([...committed, ...working, ...staged])].sort();
+  // Only committed changes since the baseline are task evidence; the working tree may hold unrelated edits.
+  const committedFiles = [...new Set(committed)].sort();
+  const uncommittedFiles = [...new Set([...working, ...staged])].filter(file => !committedFiles.includes(file)).sort();
   const key = createHash('sha256').update(JSON.stringify({ baseline, head, files: changedFiles.map(file => {
     const full = path.join(root, file);
     const stat = fs.lstatSync(full, { throwIfNoEntry: false });
     return [file, !stat ? null : stat.isSymbolicLink() ? ['symlink', fs.readlinkSync(full)]
       : stat.isFile() ? createHash('sha256').update(fs.readFileSync(full)).digest('hex') : 'directory'];
   }) })).digest('hex');
-  return { head, changedFiles, key };
+  return { head, changedFiles, committedFiles, uncommittedFiles, key };
 }
 export function markdownFiles(dir) {
   if (!dir || !fs.existsSync(dir)) return [];
