@@ -380,4 +380,6 @@ test('decision file name uses the decision date and the body keeps the source', 
   assert.match(path.basename(recorded.filePath), /^2026-01-15_DEC-/);
   const body = readNote(fs.readFileSync(recorded.filePath, 'utf8')).body;
   assert.match(body, /## Источник подтверждения\nСообщение пользователя 15\.01\n\nДата решения: 2026-01-15\./);
+  fs.writeFileSync(path.join(path.dirname(recorded.filePath), '_INDEX.md'), '# Индекс: Решения\n');
+  assert.equal(run(['doctor']).allOk, true);
 }));

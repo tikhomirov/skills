@@ -42,7 +42,7 @@ export function cmdDoctor({ paths }) {
     check(`${task.id}: filename`, validStatus && /^\d{4}-\d{2}-\d{2}$/.test(props.status_changed || '') && path.basename(task.file) === taskFilename(task.id, props.status, props.status_changed));
     if (status?.role === 'done' && props.completion_origin !== 'board') check(`${task.id}: report`, props.knowledge_sync === 'synced' && Boolean(props.report) && fs.existsSync(path.join(paths.reportsDir, task.id + '.md')));
   }
-  for (const file of markdownFiles(paths.decisionsDir)) {
+  for (const file of markdownFiles(paths.decisionsDir).filter(file => !path.basename(file).startsWith('_'))) {
     const props = readNote(fs.readFileSync(file, 'utf8')).properties;
     check(`${path.basename(file)}: decision approved by user`, props.review === 'approved' && props.approved_by && props.approved_at && props.approval_source);
     check(`${path.basename(file)}: decision task IDs`, Array.isArray(props.task_ids) && props.task_ids.length > 0 && props.task_ids.every(id => tasks.some(task => task.id === id)));

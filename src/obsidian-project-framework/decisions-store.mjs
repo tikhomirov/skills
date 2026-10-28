@@ -3,7 +3,8 @@ import path from 'node:path';
 import { markdownFiles, readNote, wikiLink, writeProject } from './utils.mjs';
 
 export function listDecisions(paths) {
-  return markdownFiles(paths.decisionsDir).map(file => ({ file, ...readNote(fs.readFileSync(file, 'utf8')) }))
+  // Generated navigation such as _INDEX.md is not a decision event.
+  return markdownFiles(paths.decisionsDir).filter(file => !path.basename(file).startsWith('_')).map(file => ({ file, ...readNote(fs.readFileSync(file, 'utf8')) }))
     .sort((a, b) => String(a.properties.decided_at || a.properties.approved_at || '').localeCompare(String(b.properties.decided_at || b.properties.approved_at || '')) || a.file.localeCompare(b.file));
 }
 export function refreshDecisionTimeline(options, tasks) {
