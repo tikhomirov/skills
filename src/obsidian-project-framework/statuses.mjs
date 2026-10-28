@@ -1,6 +1,10 @@
 import fs from 'node:fs';
 import { DEFAULT_STATUSES } from './constants.mjs';
 
+// backlog/active/done are required; archive is optional (card is finished and kept for the archive).
+export const ROLES = ['backlog', 'active', 'done', 'archive'];
+export const isFinishedRole = role => role === 'done' || role === 'archive';
+
 export function generateStatusDocument() {
   return `# Статусы задач
 
@@ -22,7 +26,7 @@ export function readStatuses(paths, { allowDefault = false } = {}) {
     const cells = line.trim().split(/(?<!\\)\|/).slice(1, -1).map(cell => cell.trim().replace(/\\\|/g, '|'));
     if (cells[0] === 'status' || /^:?-+:?$/.test(cells[0] || '')) continue;
     const [id, label, role, description] = cells;
-    if (!/^[a-z][a-z0-9-]*$/.test(id || '') || !label || !description || !['backlog', 'active', 'done'].includes(role)) {
+    if (!/^[a-z][a-z0-9-]*$/.test(id || '') || !label || !description || !ROLES.includes(role)) {
       throw new Error(`Invalid status row in _statuses.md: ${line.trim()}`);
     }
     if (result.some(status => status.id === id)) throw new Error(`Duplicate status in _statuses.md: ${id}`);
@@ -39,5 +43,5 @@ export function getStatus(paths, id) {
   return status;
 }
 export function firstStatus(paths, role) {
-  return readStatuses(paths).find(status => status.role === role).id;
+  return readStatuses(paths).find(status => status.role === role)?.id ?? null;
 }

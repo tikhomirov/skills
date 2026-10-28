@@ -383,3 +383,53 @@ test('decision file name uses the decision date and the body keeps the source', 
   fs.writeFileSync(path.join(path.dirname(recorded.filePath), '_INDEX.md'), '# Индекс: Решения\n');
   assert.equal(run(['doctor']).allOk, true);
 }));
+
+test('optional archive role: board column, archive status on archive, done on restore, finished for dependencies', () => fixture(({ root, paths, run }) => {
+  run(['init']);
+  const registry = fs.readFileSync(paths.statusesFile, 'utf8').trimEnd() + '\n| archive | Архив | archive | Карточки, готовые к перемещению в _archive. |\n';
+  fs.writeFileSync(paths.statusesFile, registry);
+  run(['task', 'sync']);
+  assert.match(fs.readFileSync(paths.tasksBase, 'utf8'), /groupOrder:\n      - backlog\n      - in-progress\n      - done\n      - archive/);
+  assert.equal(run(['doctor']).allOk, true);
+  const task = run(['task', 'create', 'Archived by status']);
+  assert.match(run(['task', 'status', task.taskId, 'archive'], false).stderr, /Only completed tasks/);
+  run(['task', 'start', task.taskId]);
+  run(['knowledge', 'sync', task.taskId, '--summary', 'Ready', '--checks', 'Tests passed', '--verification', 'passed']);
+  run(['task', 'complete', task.taskId]);
+  const dependent = run(['task', 'create', 'Depends on archived', '--depends-on', task.taskId]);
+  const marked = run(['task', 'status', task.taskId, 'archive']); assert.match(marked.filePath, /_archive_\d{4}-\d{2}-\d{2}\.md$/);
+  assert.equal(readNote(fs.readFileSync(marked.filePath, 'utf8')).properties.knowledge_sync, 'synced');
+  assert.ok(!fs.readFileSync(paths.stateFile, 'utf8').includes(`|${task.taskId}]]`));
+  assert.equal(run(['doctor']).allOk, true);
+  run(['task', 'start', dependent.taskId]);
+  const archived = run(['task', 'archive', task.taskId]);
+  assert.ok(archived.filePath.includes(`${path.sep}_archive${path.sep}`)); assert.equal(archived.status, 'archive');
+  sameAfter(root, () => run(['task', 'archive', task.taskId]));
+  const restored = run(['task', 'restore', task.taskId]); assert.equal(restored.status, 'done');
+  assert.match(restored.filePath, /_done_\d{4}-\d{2}-\d{2}\.md$/); assert.ok(!restored.filePath.includes('_archive'));
+  const props = readNote(fs.readFileSync(restored.filePath, 'utf8')).properties;
+  assert.deepEqual(props.tags.filter(tag => tag.startsWith('статус/')), ['статус/done']);
+  const again = run(['task', 'archive', task.taskId]); assert.equal(again.status, 'archive');
+  assert.equal(run(['doctor']).allOk, true);
+}));
+
+test('board drag to archive status is kept by sync and archived without a new status', () => fixture(({ root, paths, run }) => {
+  run(['init']);
+  fs.writeFileSync(paths.statusesFile, fs.readFileSync(paths.statusesFile, 'utf8').trimEnd() + '\n| archive | Архив | archive | В архив. |\n');
+  const task = run(['task', 'create', 'Dragged']);
+  fs.writeFileSync(task.filePath, updateNote(fs.readFileSync(task.filePath, 'utf8'), { status: 'archive' }));
+  const synced = run(['task', 'sync']).tasks[0]; assert.match(synced.filePath, /_archive_/);
+  sameAfter(root, () => run(['task', 'sync']));
+  assert.equal(run(['doctor']).allOk, true);
+  assert.equal(run(['status']).counts.archive, 1);
+  const archived = run(['task', 'archive', task.taskId]); assert.equal(archived.status, 'archive');
+  assert.equal(run(['status']).taskCount, 0);
+}));
+
+test('projects without archive role keep done status in the archive', () => fixture(({ paths, run }) => {
+  run(['init']); const task = run(['task', 'create', 'Plain']);
+  fs.writeFileSync(task.filePath, updateNote(fs.readFileSync(task.filePath, 'utf8'), { status: 'done' }));
+  run(['task', 'sync']);
+  const archived = run(['task', 'archive', task.taskId]); assert.equal(archived.status, 'done'); assert.match(archived.filePath, /_done_/);
+  const restored = run(['task', 'restore', task.taskId]); assert.equal(restored.status, 'done');
+}));

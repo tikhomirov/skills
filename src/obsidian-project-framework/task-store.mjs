@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { readStatuses } from './statuses.mjs';
+import { isFinishedRole, readStatuses } from './statuses.mjs';
 import { generateTasksBase, tasksBaseIsCurrent } from './templates.mjs';
 import { refreshDecisionTimeline } from './decisions-store.mjs';
 import { assertWithin, isAgentWritable, markdownFiles, readNote, wikiLink, writeProject } from './utils.mjs';
@@ -47,7 +47,7 @@ export function refreshIndexes(options) {
   if (board === null || !tasksBaseIsCurrent(board, boardFolder, statuses)) writeProject(options.paths.tasksBase, generateTasksBase(path.basename(options.paths.base), boardFolder, statuses), options);
   writeProject(options.paths.archiveBase, `filters:\n  and:\n    - 'file.inFolder(${JSON.stringify(path.relative(options.paths.vaultRoot, options.paths.archiveDir).split(path.sep).join('/'))})'\n    - 'type == "task"'\nviews:\n  - type: table\n    name: Архив задач\n    order:\n      - id\n      - title\n      - status\n      - archived_at\n`, options);
   refreshDecisionTimeline(options, listTasks(options.paths, true));
-  const focus = tasks.filter(task => statuses.find(status => status.id === task.properties.status)?.role !== 'done');
+  const focus = tasks.filter(task => !isFinishedRole(statuses.find(status => status.id === task.properties.status)?.role));
   const oldState = fs.existsSync(options.paths.stateFile) ? fs.readFileSync(options.paths.stateFile, 'utf8') : '';
   const section = focus.map(task => `- ${wikiLink(task.file, options.paths, task.id)}: ${task.properties.title} — ${task.properties.status}`).join('\n') || 'Нет открытых задач.';
   const state = oldState.includes('## Задачи\n')

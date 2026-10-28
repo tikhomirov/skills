@@ -3,7 +3,7 @@ import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { getGitHead, getGitState, readNote, updateNote, wikiLink, writeProject } from '../utils.mjs';
 import { generateTaskTemplate } from '../templates.mjs';
-import { firstStatus, getStatus, readStatuses } from '../statuses.mjs';
+import { firstStatus, getStatus, isFinishedRole, readStatuses } from '../statuses.mjs';
 import { getDocumentState } from '../document-state.mjs';
 import { listTasks, findTask, taskFilename, renameTask, refreshIndexes, activeTaskId } from '../task-store.mjs';
 
@@ -41,8 +41,11 @@ export function cmdTaskStatus(options) {
   if (role === 'active' && !options.reconcile) {
     for (const link of task.properties.depends_on || []) {
       const dependency = String(link).match(/TASK-\d+/)?.[0];
-      if (!dependency || getStatus(paths, findTask(paths, dependency).properties.status).role !== 'done') throw new Error(`Unfinished dependency: ${link}`);
+      if (!dependency || !isFinishedRole(getStatus(paths, findTask(paths, dependency).properties.status).role)) throw new Error(`Unfinished dependency: ${link}`);
     }
+  }
+  if (role === 'archive' && !options.reconcile && !isFinishedRole(previousRole)) {
+    throw new Error(`Only completed tasks can get an archive status: complete ${taskId} first`);
   }
   if (role === 'done' && !options.reconcile) {
     if (task.properties.knowledge_sync !== 'synced' || !task.properties.report) {
@@ -67,7 +70,7 @@ export function cmdTaskStatus(options) {
     ...(options.reconcile && role === 'done' ? { completion_origin: 'board', verification_state: 'user-marked-review-required' } : {}),
     tags: [...new Set(['задачи', ...(Array.isArray(task.properties.tags) ? task.properties.tags : []).filter(tag => !String(tag).startsWith('статус/')), `статус/${status}`])],
   };
-  if ((role === 'active' && previousRole !== 'active') || (previousRole === 'done' && role !== 'done')) {
+  if ((role === 'active' && previousRole !== 'active') || (isFinishedRole(previousRole) && !isFinishedRole(role))) {
     changes.git_baseline = getGitHead(projectRoot);
     changes.knowledge_sync = 'pending';
     changes.report = null;
