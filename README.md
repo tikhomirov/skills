@@ -65,6 +65,7 @@ Verify recommendations and actual diffs before and after changes. Do not use the
 
 | Skill | Description | Location |
 |---|---|---|
+| **`seo-getting-started`** | First conversation with a site owner: sites, goals, access and working rules; no audit or recurring checks without consent. | `skills/seo/seo-getting-started` |
 | **`obsidian`** | Precise instructions for Obsidian tools and formats: Markdown, Properties/YAML, wiki links, Bases, Canvas and the application's CLI. | `skills/engineering/obsidian` |
 | **OF / `obsidian-framework`** | **In development.** Experimental project and skill; excluded from installation. | `skills/in-dev/obsidian-framework` |
 | **`code-improvement`** | **In development.** Experimental improvement instructions; not a required workflow. | `skills/in-dev/code-improvement` |

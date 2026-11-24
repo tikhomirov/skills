@@ -26,6 +26,7 @@ skills/
 ├── seo/
 │   ├── diagnostika-padeniya-trafika/
 │   ├── geo-aeo-llm-poisk/
+│   ├── seo-getting-started/
 │   └── seo-audit-tehnicheskiy-kontentnyy/
 ├── tools/{find-skills,web-search}/
 └── ui-ux/{dandy-design,frontend-skill,frontend-ui-ux-design}/
