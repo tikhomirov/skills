@@ -2,39 +2,50 @@
 
 [Кратко по-русски](README.ru.md)
 
-A curated collection of production-ready **Agent Skills** for AI coding assistants (**Claude Code**, **Codex**, **OpenCode**, **Pi**, **Cursor**, etc.).
+A thematic collection of **Agent Skills** for AI coding assistants (**Claude Code**, **Codex**, **OpenCode**, **Pi**, **Cursor**, etc.).
 
 Designed for modern **PHP 8.3+**, **Laravel 11/12/13**, **MoonShine Admin**, **Pest PHP**, **APIs & Webhooks**, **UI/UX Engineering**, and clean **OOP WordPress**.
 
 ---
 
-## Start here: your first project
+## Experimental status: OF (Obsidian Framework)
 
-The framework lets your coding agent keep project tasks, documentation and session memory in an Obsidian vault. You discuss decisions with the agent and use the Kanban board to move tasks.
+**OF is an in-development project and skill, not a production-ready framework or the default workflow for this collection.** Its skill lives in `skills/in-dev/obsidian-framework/`. The related `code-improvement` and `project-workshop` skills are also experiments in `skills/in-dev/`.
+
+Do not activate these skills, rely on their instructions or install them by default. Work on them only when explicitly requested. The installer excludes `in-dev` entirely, including explicitly named skills. Existing external links are not removed automatically.
+
+The OF walkthrough and technical reference below document the experimental project only. They are not general setup instructions. The existing CLI name `obsidian-project-framework` is retained for compatibility.
+
+## Start here: install the shared skill collection
 
 ### 1. Install once
 
-You need **Node.js 20+**, Git, and **Obsidian 1.14+** with Bases enabled.
+You need **Node.js 20+** and Git. Obsidian is not required to install the skill collection.
 
 ```bash
 git clone https://github.com/tikhomirov/skills.git
 cd skills
 npm ci
 npm link
-skills-install obsidian obsidian-project-framework project-workshop improvement --global
+skills-install --global --link-source --dry-run
+skills-install --global --link-source
 ```
 
 Already cloned? Start with `cd skills`. `npm link` puts the executable helpers on your PATH; `skills-install` installs the agent instructions. If linking fails due to permissions, use a user-owned Node.js installation rather than running the whole setup with sudo.
 
-### 2. Ask your agent to set up the project
+### Experimental OF walkthrough — explicit opt-in only
+
+The following describes OF development/testing, not default installation. Use a temporary vault; back up any existing data. Obsidian 1.14+ with Bases is needed to inspect the board. The experiment is not available through `skills-install`.
+
+#### Ask your agent to test the experiment
 
 Open **your application's repository** in your AI coding assistant. Restart its session if necessary to discover the newly installed skills. Send:
 
 > Use project-workshop and obsidian-project-framework to set up this project's documentation in Obsidian. Vault: `/absolute/path/to/vault`; project ID: `my-project`. First inspect the project and existing documents, then agree on rules and modules with me. Do not change application code. Back up documents before replacing them. Create module documentation only after my explicit permission.
 
-**Replace the path and ID.** The vault is an existing folder opened in Obsidian, not the application source directory. The agent asks questions and creates the structure; you do not need to write configuration files or learn the CLI first. If skills are not discovered, point the agent to `skills/obsidian-project-framework/SKILL.md` and `skills/project-workshop/SKILL.md` in this clone.
+**Replace the path and ID.** The vault is an existing folder opened in Obsidian, not the application source directory. The agent asks questions and creates the structure; you do not need to write configuration files or learn the CLI first. If skills are not discovered, point the agent to `skills/in-dev/obsidian-framework/SKILL.md` and `skills/in-dev/project-workshop/SKILL.md` in this clone.
 
-### 3. Open the board and work
+#### Inspect the experimental board
 
 In Obsidian, open `Projects/my-project/Tasks/_Задачи.base`. An existing `Проекты/` folder is reused. Initial columns are **Backlog → In Progress → Done**.
 
@@ -50,25 +61,25 @@ For manual commands: `obsidian-project-framework --help`. The sections below are
 
 ## 📦 Included Skills and Frameworks
 
-Apply `improvement` before and after changes: verify recommendations, prefer the smallest useful patch, evaluate neighboring contracts and stage risky migrations explicitly.
+Verify recommendations and actual diffs before and after changes. Do not use the experimental `code-improvement` skill as a required review process.
 
 | Skill | Description | Location |
 |---|---|---|
-| **`obsidian`** | Precise instructions for Obsidian tools and formats: Markdown, Properties/YAML, wiki links, Bases, Canvas and the application's CLI. | `skills/obsidian` |
-| **`obsidian-project-framework`** | Integrated project framework: skills, instructions, templates and executable helpers for tasks, user decisions, memory and reports. This directory contains its agent entry skill. | `skills/obsidian-project-framework` |
-| **`improvement`** | Reasoned improvements: validate findings, constrain scope, assess adjacent behavior before/after changes and stage risky transitions. | `skills/improvement` |
-| **`main-rule`** | Baseline senior development rules: simplicity, minimal code volume, step-by-step plans, and working code first. | `skills/main-rule` |
-| **`moonshine`** | Comprehensive toolkit for building, configuring, and extending Laravel **MoonShine** admin panels (MoonShine 4.x & 3.x). Deep-dive references for ModelResources, CRUD pages, relationships, FormBuilder, TableBuilder, and Blade components. | `skills/moonshine` |
-| **`laraway`** | Core philosophy, conventions, and pragmatic architecture of **The Laravel Way** (laraway.github.io, Laracasts, community practices). Anti-pattern prevention (no cargo-cult repositories, no N+1, lean controllers, native PHP vs magic balance). | `skills/laraway` |
-| **`laravel-strict`** | Strict model enforcement (`nunomaduro/essentials`), auto eager loading, immutable dates, HTTP client fakes, Livewire security patterns, and 28 actionable recipes. | `skills/laravel-strict` |
-| **`pest-testing`** | Pest PHP v3/v4 testing guide for Laravel: Feature/Unit tests, Architecture tests (`arch()`), datasets, and mocking external services (`Http::fake()`, `Queue::fake()`, `Event::fake()`). | `skills/pest-testing` |
-| **`api-integrations`** | Resilient external API integrations & webhook receivers: HMAC signature validation, idempotency keys, automatic retry backoff, sensitive data masking, and deduplication. | `skills/api-integrations` |
-| **`wordpress-clean-plugin`** | Modern OOP WordPress development: archetypes (Micro, Combine, Super-plugins), PSR-11 DI container, `wp-queue` background processing, wp-kama performance snippets, mandatory 2FA, restricted REST API, and full project security audit. | `skills/wordpress-clean-plugin` |
-| **`dandy-style`** | Dandy Code philosophy and 22 structured recipes for clean, idiomatic, readable PHP/Laravel code without unnecessary boilerplate. | `skills/dandy-style` |
-| **`dandy-design`** | Concise MUST / SHOULD / NEVER rules for building accessible, responsive, fast, and delightful user interfaces. | `skills/dandy-design` |
-| **`dandy-commit`** | Pre-commit git diff inspector to eliminate style drift, duplicate abstractions, and noisy AI-generated code smells before pushing. | `skills/dandy-commit` |
-| **`ai-docs-setup`** | Set up agent entry points and documentation placement; migrate legacy `.ai/` to the Obsidian project framework without duplicating sources of truth. | `skills/ai-docs-setup` |
-| **`iiko-docs`** | Навигация и поиск по документации iiko Cloud API, iikoWeb, Telegram-каналу iikoapi, ядру iiko-core и плагину woo2iiko с предупреждениями о расхождениях со Swagger. | `skills/iiko-docs` |
+| **`obsidian`** | Precise instructions for Obsidian tools and formats: Markdown, Properties/YAML, wiki links, Bases, Canvas and the application's CLI. | `skills/engineering/obsidian` |
+| **OF / `obsidian-framework`** | **In development.** Experimental project and skill; excluded from installation. | `skills/in-dev/obsidian-framework` |
+| **`code-improvement`** | **In development.** Experimental improvement instructions; not a required workflow. | `skills/in-dev/code-improvement` |
+| **`project-workshop`** | **In development.** Experimental project setup dialogue. | `skills/in-dev/project-workshop` |
+| **`main-rule`** | Baseline senior development rules: simplicity, minimal code volume, step-by-step plans, and working code first. | `skills/System/main-rule` |
+| **`moonshine`** | Comprehensive toolkit for building, configuring, and extending Laravel **MoonShine** admin panels (MoonShine 4.x & 3.x). Deep-dive references for ModelResources, CRUD pages, relationships, FormBuilder, TableBuilder, and Blade components. | `skills/code/moonshine` |
+| **`laraway`** | Core philosophy, conventions, and pragmatic architecture of **The Laravel Way** (laraway.github.io, Laracasts, community practices). Anti-pattern prevention (no cargo-cult repositories, no N+1, lean controllers, native PHP vs magic balance). | `skills/code/laraway` |
+| **`laravel-strict`** | Strict model enforcement (`nunomaduro/essentials`), auto eager loading, immutable dates, HTTP client fakes, Livewire security patterns, and 28 actionable recipes. | `skills/code/laravel-strict` |
+| **`pest-testing`** | Pest PHP v3/v4 testing guide for Laravel: Feature/Unit tests, Architecture tests (`arch()`), datasets, and mocking external services (`Http::fake()`, `Queue::fake()`, `Event::fake()`). | `skills/code/pest-testing` |
+| **`api-integrations`** | Resilient external API integrations & webhook receivers: HMAC signature validation, idempotency keys, automatic retry backoff, sensitive data masking, and deduplication. | `skills/code/api-integrations` |
+| **`wordpress-clean-plugin`** | Modern OOP WordPress development: archetypes (Micro, Combine, Super-plugins), PSR-11 DI container, `wp-queue` background processing, wp-kama performance snippets, mandatory 2FA, restricted REST API, and full project security audit. | `skills/code/wordpress-clean-plugin` |
+| **`dandy-style`** | Dandy Code philosophy and 22 structured recipes for clean, idiomatic, readable PHP/Laravel code without unnecessary boilerplate. | `skills/code/dandy-style` |
+| **`dandy-design`** | Concise MUST / SHOULD / NEVER rules for building accessible, responsive, fast, and delightful user interfaces. | `skills/ui-ux/dandy-design` |
+| **`dandy-commit`** | Pre-commit git diff inspector to eliminate style drift, duplicate abstractions, and noisy AI-generated code smells before pushing. | `skills/engineering/dandy-commit` |
+| **`ai-docs-setup`** | Agent entry points and documentation placement. OF-related migration guidance remains experimental and requires explicit opt-in. | `skills/engineering/ai-docs-setup` |
 
 ---
 
@@ -86,7 +97,7 @@ curl -sSL https://raw.githubusercontent.com/tikhomirov/skills/main/install.sh | 
 
 ### Install Specific Skills Only
 ```bash
-curl -sSL https://raw.githubusercontent.com/tikhomirov/skills/main/install.sh | bash -s -- --global obsidian obsidian-project-framework
+curl -sSL https://raw.githubusercontent.com/tikhomirov/skills/main/install.sh | bash -s -- --global obsidian laraway
 ```
 
 ---
@@ -111,10 +122,9 @@ cd skills
 # Install specific skills
 ./bin/skills-install --global moonshine pest-testing
 
-# Register both commands in PATH from a clone
+# Register package commands in PATH (includes the experimental OF CLI)
 npm link
 skills-install --help
-obsidian-project-framework --help
 ```
 
 Supported agent paths:
@@ -123,22 +133,24 @@ Supported agent paths:
 
 ---
 
+## Thematic storage and shared source
+
+See [skills storage](docs/skills-storage.md) for the full category tree and safe multi-agent symlinks. For a persistent clone: `./bin/skills-install --global --link-source --dry-run`, then repeat without `--dry-run`. Existing conflicting skills are never replaced in this mode. Zed integration depends on its agent; see the guide.
+
+Experimental entries live under `skills/in-dev/{obsidian-framework,code-improvement,project-workshop}` and are excluded from discovery and installation. OF includes both the experimental skill and its CLI project; keeping the CLI available does not make the project ready for routine use.
+
 ## 📁 Repository Structure
 
 ```text
 skills/
 ├── skills/                      # Main skills directory
-│   ├── moonshine/
-│   ├── laravel-strict/
-│   ├── pest-testing/
-│   ├── api-integrations/
-│   ├── wordpress-clean-plugin/
-│   ├── dandy-style/
-│   ├── dandy-design/
-│   ├── dandy-commit/
-│   ├── obsidian/
-│   ├── obsidian-project-framework/
-│   └── ai-docs-setup/
+│   ├── System/                  # Baseline rules
+│   ├── engineering/             # Workflow, Obsidian, reviews
+│   ├── code/                    # PHP, Laravel, WordPress
+│   ├── in-dev/                  # Experiments; never installed
+│   ├── seo/                     # One directory + SKILL.md per skill
+│   ├── tools/                   # Search and skill discovery
+│   └── ui-ux/                   # Design and frontend
 ├── bin/                         # Executable entry points only
 │   ├── skills-install
 │   └── obsidian-project-framework
@@ -158,12 +170,12 @@ skills/
 
 ---
 
-## Obsidian Project Framework
+## OF — experimental project reference
 
-**`obsidian-project-framework` is an integrated solution, not just a skill collection:**
+**The entire Obsidian Framework project is in development**, including its skill, CLI, templates and generated instructions. The following documents implementation behavior, not a readiness guarantee or mandatory process.
 
-- `skills/obsidian/` — precise instructions for Obsidian formats and tools;
-- `skills/obsidian-project-framework/` — agent entry skill, project protocol and recipes;
+- `skills/engineering/obsidian/` — separate Obsidian tools skill, outside OF;
+- `skills/in-dev/obsidian-framework/` — experimental agent entry skill, protocol and recipes;
 - generated `AGENTS.md`, `_statuses.md`, templates and navigation — project instructions and structure;
 - `bin/obsidian-project-framework` with `src/obsidian-project-framework/` — executable helpers implementing that protocol.
 

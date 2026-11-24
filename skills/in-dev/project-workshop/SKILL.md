@@ -5,7 +5,7 @@ description: Диалоговая настройка пользовательс�
 
 # Project Workshop — настройка проекта с человеком
 
-Это отдельный скилл комплекса obsidian-project-framework, не расширение ai-docs-setup. Технические форматы описывает obsidian; рабочую механику — obsidian-project-framework.
+Это отдельный скилл комплекса obsidian-project-framework. Технические форматы описывает obsidian; рабочую механику — obsidian-project-framework.
 
 ## Порядок
 1. Прочитать существующие AGENTS, _statuses, карту, правила репозитория и решения. Не заменять существующие договорённости своими предположениями.

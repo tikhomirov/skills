@@ -10,7 +10,26 @@ const __dirname = path.dirname(__filename);
 const repoRoot = path.resolve(__dirname, '../..');
 const canonicalSource = path.join(repoRoot, 'skills');
 
+function discoverSkills(directory) {
+  const found = new Map();
+  function visit(dir) {
+    if (fs.existsSync(path.join(dir, 'SKILL.md'))) {
+      const name = path.basename(dir);
+      if (found.has(name)) throw new Error(`Duplicate skill directory: ${name}`);
+      found.set(name, dir);
+      return;
+    }
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      if (entry.isDirectory() && !entry.name.startsWith('.') && entry.name !== 'in-dev') visit(path.join(dir, entry.name));
+    }
+  }
+  visit(directory);
+  return found;
+}
+const available = discoverSkills(canonicalSource);
 const args = process.argv.slice(2);
+const linkSource = args.includes('--link-source');
+const dryRun = args.includes('--dry-run');
 const isGlobal = args.includes('--global') || args.includes('-g');
 const isHelp = args.includes('--help') || args.includes('-h');
 
@@ -24,21 +43,25 @@ Usage:
 
 Options:
   --global, -g    Install skills globally for all projects
+  --link-source  Link directly to this persistent clone; refuse conflicting targets
+  --dry-run      Preview without creating files or directories
   --help, -h      Show this help message
 
+Experimental skills under in-dev are excluded from discovery and installation.
+
 Available skills:
-${fs.readdirSync(canonicalSource).filter(d => fs.statSync(path.join(canonicalSource, d)).isDirectory()).map(s => `  - ${s}`).join('\n')}
+${[...available.keys()].sort().map(s => `  - ${s}`).join('\n')}
 `);
   process.exit(0);
 }
 
-const unknownFlags = args.filter(a => a.startsWith('-') && !['--global', '-g'].includes(a));
+const unknownFlags = args.filter(a => a.startsWith('-') && !['--global', '-g', '--link-source', '--dry-run'].includes(a));
 if (unknownFlags.length) {
   console.error(`Unknown option: ${unknownFlags.join(', ')}. See skills-install --help.`);
   process.exit(1);
 }
 const requestedSkills = args.filter(a => !a.startsWith('-'));
-const allAvailableSkills = fs.readdirSync(canonicalSource).filter(d => fs.statSync(path.join(canonicalSource, d)).isDirectory());
+const allAvailableSkills = [...available.keys()].sort();
 const unknownSkills = requestedSkills.filter(s => !allAvailableSkills.includes(s));
 if (unknownSkills.length) {
   console.error(`Unknown skill: ${unknownSkills.join(', ')}. See skills-install --help.`);
@@ -63,6 +86,23 @@ const destinations = isGlobal
       { name: 'pi', path: path.join(cwd, '.pi', 'skills'), type: 'symlink' },
     ];
 
+if (linkSource) {
+  destinations.push({ name: 'cursor', path: path.join(isGlobal ? homeDir : cwd, '.cursor', 'skills'), type: 'symlink' });
+  // Preflight every destination before writing anything. Never replace personal skills.
+  let conflict = false;
+  for (const dest of destinations) {
+    for (const skill of skillsToInstall) {
+      const target = path.join(dest.path, skill);
+      const existing = fs.lstatSync(target, { throwIfNoEntry: false });
+      if (existing && !(existing.isSymbolicLink() && fs.existsSync(target) && fs.realpathSync(target) === available.get(skill))) {
+        console.error(`Conflict (unchanged): ${target}`);
+        conflict = true;
+      }
+    }
+  }
+  if (conflict) process.exit(1);
+}
+
 console.log(`Installing skills: ${skillsToInstall.join(', ')} (${isGlobal ? 'Globally' : 'Locally in current project'})...\n`);
 
 function sameTree(source, target) {
@@ -81,15 +121,19 @@ function sameTree(source, target) {
 
 for (const dest of destinations) {
   try {
-    fs.mkdirSync(dest.path, { recursive: true });
+    if (!dryRun) fs.mkdirSync(dest.path, { recursive: true });
 
     for (const skill of skillsToInstall) {
       // Links must survive removal of an npm cache or the remote installer's temporary clone.
-      const src = dest.type === 'symlink'
+      const src = linkSource ? available.get(skill) : dest.type === 'symlink'
         ? path.join(destinations[0].path, skill)
-        : path.join(canonicalSource, skill);
+        : available.get(skill);
       const target = path.join(dest.path, skill);
 
+      if (dryRun) {
+        console.log(`${target} -> ${src}`);
+        continue;
+      }
       if (!fs.existsSync(src)) continue;
 
       const existing = fs.lstatSync(target, { throwIfNoEntry: false });
@@ -98,7 +142,9 @@ for (const dest of destinations) {
       if (existing?.isSymbolicLink()) fs.unlinkSync(target);
       else if (existing) fs.rmSync(target, { recursive: true, force: true });
 
-      if (dest.type === 'copy') {
+      if (linkSource) {
+        fs.symlinkSync(src, target, 'dir');
+      } else if (dest.type === 'copy') {
         fs.cpSync(src, target, { recursive: true });
       } else {
         try {

@@ -1,6 +1,6 @@
 ---
 name: main-rule
-description: Базовые системные правила работы агента (Senior Developer подход, минимализм, доведение задач до конца).
+description: The main basic system rules of work, the project rules only specify them
 disable-model-invocation: true
 ---
 

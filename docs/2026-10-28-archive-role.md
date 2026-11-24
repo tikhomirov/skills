@@ -1,5 +1,7 @@
 # Роль статуса archive в obsidian-project-framework
 
+> OF (Obsidian Framework) — экспериментальный проект в разработке. Эта техническая заметка не является инструкцией для обычной работы; скилл находится в `skills/in-dev/obsidian-framework/`.
+
 ## Резюме
 В talasus `_statuses.md` есть строка `archive | Архив | archive`. CLI принимал только роли backlog/active/done, поэтому любая команда по проекту падала с `Invalid status row`. Теперь archive — законная необязательная роль, проекты без неё работают как раньше.
 

@@ -1,7 +1,7 @@
 {
   "name": "@tikhomirov/skills",
   "version": "1.2.0",
-  "description": "Curated collection of production-ready Agent Skills (MoonShine, Laravel Best Practices, Pest, API Integrations, WordPress Clean Plugin, Dandy Style, Dandy Design, Dandy Commit, etc.)",
+  "description": "Thematic Agent Skills collection for coding assistants; includes the experimental OF (Obsidian Framework) project, excluded from default skill installation.",
   "type": "module",
   "engines": {
     "node": ">=20"

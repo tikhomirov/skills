@@ -2,7 +2,7 @@
 .PHONY: help test check install-local install-global
 
 help: ## Show developer commands
-	@printf 'Commands:\n  make test            Run all tests\n  make check           Check JavaScript syntax\n  make install-local   Install skills in this repository\n  make install-global  Install skills for all projects\n\nCLI:\n  ./bin/skills-install --help\n  ./bin/obsidian-project-framework --help\n'
+	@printf 'Commands:\n  make test            Run all tests\n  make check           Check JavaScript syntax\n  make install-local   Install skills in this repository\n  make install-global  Install skills for all projects\n\nCLI:\n  ./bin/skills-install --help\n  ./bin/obsidian-project-framework --help  # OF: experimental, explicit development only\n'
 
 test: ## Run all tests
 	npm test
