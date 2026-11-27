@@ -6,7 +6,7 @@
 
 - `skills/System/` — общие правила.
 - `skills/code/` — PHP, Laravel, MoonShine, WordPress, API и тесты.
-- `skills/engineering/` — инженерные инструменты, Obsidian, review.
+- `skills/engineering/` — инженерные инструменты, Obsidian, review; `ai-docs-setup` — контракт проектной памяти (`AGENTS.md`, `.ai/`).
 - `skills/seo/` — SEO, диагностика и GEO/AEO. `seo-getting-started` — первый разговор с владельцем: сайты, цели, доступы и правила; аудит только после согласия.
 - `skills/tools/` — поиск и обнаружение скиллов.
 - `skills/ui-ux/` — дизайн и frontend.

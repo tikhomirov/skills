@@ -6,7 +6,7 @@
 skills/
 ├── System/main-rule/
 ├── engineering/
-│   ├── ai-docs-setup/
+│   ├── ai-docs-setup/           # контракт проектной памяти (AGENTS.md, .ai/)
 │   ├── dandy-commit/
 │   ├── grill-me/
 │   ├── obsidian/
